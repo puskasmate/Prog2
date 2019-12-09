@@ -1,0 +1,262 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Arroway!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>OO szemlélet</title>
+        <para>
+        </para>
+        <para> Megoldás forrása: <link
+                xlink:href="https://gitlab.com/puskasmate/bhax/blob/master/Prog2/OO/PolarGenerator.java"
+            /></para>
+        <para>Az objektumorientált programozási nyelvekben osztályokat hozunk létre, ezeknek az
+            osztályoknak az elemeit pedig objektumoknak nevezzük. Minden objektum rendelkezik az
+            osztály összes tulajdonságával. Ez azért kényelmes, mivel elég csak az osztály
+            létrehozásakor leírni a tulajdonságait, amivel az összes létrehozott objektum
+            rendelkezni fog.</para>
+        <para>A program első részében létrehozunk egy PolarGenerator osztályt, amely két változóval
+            és egy függvénnyel fog rendelkezni. A nincsTarolt változó értéke fogja meghatározni,
+            hogy van e változó eltárolva. A függvény megvizsgálja, hogy van e változó eltárolva, ha
+            nincs, generál 2 random számot, az egyiket eltárolja, a másikat pedig visszaadja, ha
+            volt változó eltárolva akkor pedig az eltárolt változót adja vissza. A feltételes
+            utasítás mindkét ágában negálja a nincsTarolt változó értékét.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/pgen.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para><emphasis role="bold"
+            >Forráskód:</emphasis><programlisting>public class PolarGenerator { 
+	
+	boolean nincsTarolt = true;
+	double tarolt;
+	
+	public PolarGenerator(){
+		nincsTarolt = true;
+	}
+
+	public double kovetkezo(){
+		if(nincsTarolt){
+			double u1, u2, v1, v2, w;
+			do{
+				u1 = Math.random();
+				u2 = Math.random();
+				v1 = 2 * u1 - 1;
+				v2 = 2 * u2 - 1;
+				w = v1 * v1 + v2 * v2;
+				} while (w>1);
+				double r = Math.sqrt((-2 * Math.log(w))/w);
+				tarolt = r * v2;
+				nincsTarolt = !nincsTarolt;
+				return r * v1;
+				} else {
+				nincsTarolt = !nincsTarolt;
+				return tarolt;
+				}
+			}
+
+			public static void main (String[] args){
+				PolarGenerator g= new PolarGenerator();
+				for (int i=0;i &lt; 10;i++){
+					System.out.println(g.kovetkezo());
+				}
+			}
+		}
+</programlisting></para>
+    </section>        
+
+    <section>
+        <title>"Gagyi"</title>
+        <para> Megoldás forrása: <link
+                xlink:href="https://gitlab.com/puskasmate/bhax/tree/master/Prog2/Gagyi"/></para>
+        <para> Feladatunk a "<code>while(x&lt;=t&amp;&amp;x>=t&amp;&amp;t!=x)</code>" tesztkérdésen
+            alapul. Itt egyik esetben x és t objektum által hordozott érték, a másik esetben pedig
+            az objektum címe. Az Integer típus -128-127 tartományba eső számokat egy bufferbe tölti
+            be, és ebben a bufferben lévő számok azonos memóriacímet kapnak. Ezen intervallumba eső értékek
+            használatakor tehát ugyanaz a memóriacím kerül betöltésre a bufferből, így ha -128-tól kisebb vagy
+            127-től nagyobb értéket adunk meg, be tudunk lépni a ciklusba, mivel a két szám memóriacíme nem
+            fog megegyezni, de a két szám mégis megegyezik.</para>
+        <para>-128 esetén tehát nem lép be a ciklusba</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/gagyi1.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>-129 esetén pedig belépünk a ciklusba.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/gagyi2.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+    </section>
+    <section>
+        <title>Yoda</title>
+        <para>Megoldás forrása:<link
+                xlink:href="https://gitlab.com/puskasmate/bhax/tree/master/Prog2/Yoda"/></para>
+        <para>A Star Wars című film híres karaktere, Yoda az átlagostól eltérő szórendet alkalmaz. A
+            feladatunk az volt, hogy írjuk olyan programot, ami ha nem fordított szórendet használ,
+            java.lang.NullPointerException-nel
+            leáll.<programlisting>public class Yoda
+{
+
+public static void main (String[]args)
+{
+
+
+String yodaa = null;
+if (yodaa.equals("Zeusz")) {
+
+System.out.println("ASDASDas");
+			}else{
+System.out.println("Benzema");
+}
+		}
+	}
+</programlisting></para>
+        <para>Láthatjuk, hogy a java.lang.NullPointerException hibaüzenetet kapjuk vissza a program
+            futtatásakor, ha nem követjük a programban a Yoda conditiont, mivel az equals nullreferenciára hibát ad.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/yoda.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <programlisting>public class Yoda
+{
+
+public static void main (String[]args)
+{
+
+
+String yodaa = null;
+if ("Zeusz".equals(yodaa)) {
+
+System.out.println("ASDASDas");
+			}else{
+System.out.println("Benzema");
+}
+
+		}
+	}
+</programlisting>
+        <para>Ez a forráskód viszont futtatható, mivel követi a Yoda conditiont.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/Benzema.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+</section>
+        <section>
+            <title>Kódolás from scratch</title>
+            <para>Megoldás forrása:<link
+                    xlink:href="https://www.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apbs02.html#pi_jegyei"
+                /></para>
+            <programlisting>public class PiBBP {
+    
+    String d16PiHexaJegyek;
+    
+    public PiBBP(int d) {
+        
+        double d16Pi = 0.0d;
+        
+        double d16S1t = d16Sj(d, 1);
+        double d16S4t = d16Sj(d, 4);
+        double d16S5t = d16Sj(d, 5);
+        double d16S6t = d16Sj(d, 6);
+        
+        d16Pi = 4.0d*d16S1t - 2.0d*d16S4t - d16S5t - d16S6t;
+        
+        d16Pi = d16Pi - StrictMath.floor(d16Pi);
+        
+        StringBuffer sb = new StringBuffer();
+        
+        Character hexaJegyek[] = {'A', 'B', 'C', 'D', 'E', 'F'};
+        
+        while(d16Pi != 0.0d) {
+            
+            int jegy = (int)StrictMath.floor(16.0d*d16Pi);
+            
+            if(jegy&lt;10)
+                sb.append(jegy);
+            else
+                sb.append(hexaJegyek[jegy-10]);
+            
+            d16Pi = (16.0d*d16Pi) - StrictMath.floor(16.0d*d16Pi);
+        }
+        
+        d16PiHexaJegyek = sb.toString();
+    }
+    
+    public double d16Sj(int d, int j) {
+        
+        double d16Sj = 0.0d;
+        
+        for(int k=0; k&lt;=d; ++k)
+            d16Sj += (double)n16modk(d-k, 8*k + j) / (double)(8*k + j);
+        
+        
+        
+        return d16Sj - StrictMath.floor(d16Sj);
+    }
+    
+    public long n16modk(int n, int k) {
+        
+        int t = 1;
+        while(t &lt;= n)
+            t *= 2;
+        
+        long r = 1;
+        
+        while(true) {
+            
+            if(n >= t) {
+                r = (16*r) % k;
+                n = n - t;
+            }
+            
+            t = t/2;
+            
+            if(t &lt; 1)
+                break;
+            
+            r = (r*r) % k;
+            
+        }
+        
+        return r;
+    }
+   
+    public String toString() {
+        
+        return d16PiHexaJegyek;
+    }
+    
+    public static void main(String args[]) {        
+        System.out.print(new PiBBP(1000000));
+        System.out.println("");
+    }
+}</programlisting>
+            <para>A Bailey-Borwein-Plouffe formula a π kiszámítására létrehozott algoritmus.
+                1995-ben Simon Plouffe fedezte fel, és a publikált tanulmány szerzőiről nevezte
+                el.</para>
+            <para>A program a pi szám hexadecimális értékét fogja visszaadni, és az alábbi
+                algoritmus alapján fog működni.</para>
+            <para><inlinemediaobject>
+                    <imageobject>
+                        <imagedata fileref="img/bbp.png"/>
+                    </imageobject>
+                </inlinemediaobject></para>
+        <para>A program sikeresen kiszámítja a π hexadecimális értékét.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/bbprun.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        </section>
+            
+        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+</chapter>                

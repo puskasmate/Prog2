@@ -1,0 +1,279 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Valami!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>FUTURE Tevékenység Editor</title>
+        <para>Feladatunk az volt, hogy a FUTURE Tevékenység Editor java forrásán keressünk egy
+            hibát, majd pedig javísuk ezt.</para>
+        <para>Mielőtt hozzákezdenénk, egy kis ismertető, hogy mi is az a tevékenység editor.</para>
+        <para>A tevékenység editor egy olyan program, mely lehetőséget ad arra, hogy számon tartsuk,
+            az adott napon mit vittünk véghez, és ezért milyen tapasztalatot szerezhettünk, és
+            mennyit.</para>
+        <para>Mindezek előtt viszont arra is van lehetőségünk, hogy magunkat jellemezzük más
+            felhasználók számára. Például megtudjuk adni a korunkat, a súlyunkat és a magasságunkat,
+            valamint adhatunk egy becslést, hogy  a saját képességünket, tapasztalatunkat és
+            tudásunkat hány ponttal illetnénk.</para>
+        <para>A programban altevékenységeket hozhatunk létre, mint például egy LoL verseny, és ezt
+            tulajdonságokkal ruházhatjuk fel, mint pl. koncentráció, gondolkodás stb., és a program
+            egy könyvtárszerkezetet fog létrehozni.</para>
+        <para>A programban rövid használat után számos hiba fedezhető fel. Egyik legszembetűnőbb
+            talán, hogy egy tevékenységhez csak egy altevékenységet enged létrehozni.</para>
+        <para>Ennek az az oka, hogy az altevékenységeket ugyanazon a néven akarja létrehozni</para>
+        <para>.<inlinemediaobject>
+            <imageobject>
+                <imagedata fileref="img/act_ed.png"/>
+            </imageobject>
+        </inlinemediaobject></para>
+        <para>Ezt a hibát egyszerűen kijavíthatjuk. A forráskódban ez a rész lesz az új
+            altevékenység létrehozásáért
+            felelős:<programlisting>subaMenuItem.setOnAction((javafx.event.ActionEvent evt) -> {
+                java.io.File file = getTreeItem().getValue();
+
+                java.io.File f = new java.io.File(file.getPath() + System.getProperty("file.separator") + "Új altevékenység");
+
+                if (f.mkdir()) {
+                    javafx.scene.control.TreeItem&lt;java.io.File> newAct
+ //                           = new javafx.scene.control.TreeItem&lt;java.io.File>(f, new javafx.scene.image.ImageView(actIcon));
+                           = new FileTreeItem(f, new javafx.scene.image.ImageView(actIcon));                            
+                    getTreeItem().getChildren().add(newAct);
+                } else {
+
+                    System.err.println("Cannot create " + f.getPath());
+
+                }
+            });</programlisting></para>
+        <para>Ezt a problémát könnyen kiküszöbölhetjük, ha az egészet egy végtelen ciklusba tesszük,
+            és az új altevékenység után egy számlálót helyezük el, és az új altevékenységeket
+            megszámozzuk, ezáltal nem ugyanaz lesz a nevük. A kijavított változat így néz
+            ki:<programlisting>subaMenuItem.setOnAction((javafx.event.ActionEvent evt) -> {
+                
+ int i=1;
+while(true){
+                java.io.File file = getTreeItem().getValue();
+               
+
+
+                java.io.File f = new java.io.File(file.getPath() + System.getProperty("file.separator") + "Új altevékenység"+i);
+
+               if (f.mkdir()) {
+                    javafx.scene.control.TreeItem&lt;java.io.File> newAct
+ //                           = new javafx.scene.control.TreeItem&lt;java.io.File>(f, new javafx.scene.image.ImageView(actIcon));
+                           = new FileTreeItem(f, new javafx.scene.image.ImageView(actIcon));                            
+                    getTreeItem().getChildren().add(newAct);
+                    break;
+                } else {
+++i;
+                    
+                    System.out.println("Nem hozható létre a(z) "+f.getPath() + ", ezért más néven lett lérehozva.");
+}
+                }
+            
+        });</programlisting></para>
+        <para>Egy while ciklusban növeljük az i értékét, és hozzáírjuk az aktuális i-t a
+            altevékenység nevéhez. A feltételes utasításban megnézzük, hogy létre lehet e hozni az
+            adott néven az altevékenységet (mappát). Amennyiben létrehozható, létrehozza, majd
+            tevékenység editorban is megjeleníti grafikusan, és kilép a ciklusból. Hamis ágon pedig
+            növeli az i értékét, és jelzi a felhasználónak, hogy más néven lett létrehozva, így
+            megint az igaz ág fog teljesülni, amiben pedig kilép a ciklusból, így a program nem fog
+            lefagyni.</para>
+        <para>Láthatjuk, hogy a program már képes létrehozni több altevékenységet is.</para>
+        <para><inlinemediaobject>
+            <imageobject>
+                <imagedata fileref="img/act_ed2.png"/>
+            </imageobject>
+        </inlinemediaobject></para>
+    </section>
+    <section>
+        <title>SamuCam</title>
+        <para>Az volt a feladatunk, hogy mutassunk rá a SamuCam programban a kamerakezelésre.</para>
+        <para>A projekttel kapcsolatban annyit kell tudni, hogy az opencv könyvtárat telepíteni
+            kell, máskülönben nem tudjuk felépíteni illetve futtatni a programot.</para>
+        <para>A program annyit csinál, hogy képes felismerni emberi arcokat. Amennyiben a kamera egy
+            arcot rögzít, vagy valamilyen fényképet, amin egy arc található, kis idő elteltével
+            képes megjegyezni az arcot.</para>
+        <para>Ezért fontos futtatás előtt letöltenünk a lbpcascade_frontalface.xml fájlt, ugyanis ez
+            lesz felelős az emberi arc felismeréséért.</para>
+        <para>Amennyiben azt akarjuk, hogy a laptopunk webkamerája képét rögzítse a program, a
+            következő sort kell
+            megkeresnünk:<programlisting>videoCapture.open ( videoStream );</programlisting></para>
+        <para>Ez a sor a SamuCam.cpp forráskódban lesz, méghozzá a void SamuCam::openVideoStream()
+            függvényben szerepel. Ahhoz, hogy a webkameránk képe legyen rögzítve, a "videoStream"-et
+            írjuk át 0-ra.</para>
+        <para>Térjünk is át a
+            kamerakezelésre.<programlisting>SamuCam::SamuCam ( std::string videoStream, int width = 176, int height = 144 )
+  : videoStream ( videoStream ), width ( width ), height ( height )
+{
+  openVideoStream();
+}</programlisting></para>
+        <para>Láthatjuk, hogy a SamuCam konstruktorában a egy videoStream nevű string, és szélesség
+            illetve magasság méretek lesznek tárolva. A videoStream string megkapja a videoStream
+            értéke által a kamera ip címét, a width és height miatt pedig a méretei lettek
+            beállítva.</para>
+        <programlisting>void SamuCam::openVideoStream()
+{
+  videoCapture.open ( 0 );
+
+  videoCapture.set ( CV_CAP_PROP_FRAME_WIDTH, width );
+  videoCapture.set ( CV_CAP_PROP_FRAME_HEIGHT, height );
+  videoCapture.set ( CV_CAP_PROP_FPS, 10 );
+}</programlisting>
+        <para>Az openVideoStream függvényben adjuk meg a kamera ip-címét, és azt, hogy mekkora
+            felbontású képet rögzítsen, hány fps-sel.</para>
+        <para>Következő függvényünk a run függvény lesz:</para>
+        <programlisting>void SamuCam::run()
+{
+
+  cv::CascadeClassifier faceClassifier;
+
+  std::string faceXML = "lbpcascade_frontalface.xml"; // https://github.com/Itseez/opencv/tree/master/data/lbpcascades
+
+  if ( !faceClassifier.load ( faceXML ) )
+    {
+      qDebug() &lt;&lt; "error: cannot found" &lt;&lt; faceXML.c_str();
+      return;
+    }</programlisting>
+        <para>Létrehozunk egy cv::CascadeClassifier (az opencv miatt van rá lehetőségünk) változót,
+            amely azért lesz felelős, hogy betöltse a lbpcascade_frontalface.xml-t, ami ugye az
+            emberi arcot írja le. Az xml nevét egy string-ben eltároljuk, és a load metódussal
+            rávizsgálunk, hogy betudja e tölteni a CascadeClassifier az említett xml-t. Amennyiben
+            nem, mert nem található meg, error-t fog dobni, és egyértelműen jelzi a felhasználó
+            számára a hibát. Az xml egyébként a kommentben található linken szerezhető
+            be.<programlisting>while ( videoCapture.isOpened() )
+    {
+
+      QThread::msleep ( 50 );
+      while ( videoCapture.read ( frame ) )
+        {
+
+          if ( !frame.empty() )
+            {
+
+              cv::resize ( frame, frame, cv::Size ( 176, 144 ), 0, 0, cv::INTER_CUBIC );
+
+              std::vector&lt;cv::Rect> faces;
+              cv::Mat grayFrame;
+
+              cv::cvtColor ( frame, grayFrame, cv::COLOR_BGR2GRAY );
+              cv::equalizeHist ( grayFrame, grayFrame );
+
+              faceClassifier.detectMultiScale ( grayFrame, faces, 1.1, 3, 0, cv::Size ( 60, 60 ) );
+
+              if ( faces.size() > 0 )
+                {
+
+                  cv::Mat onlyFace = frame ( faces[0] ).clone();
+
+                  QImage* face = new QImage ( onlyFace.data,
+                                              onlyFace.cols,
+                                              onlyFace.rows,
+                                              onlyFace.step,
+                                              QImage::Format_RGB888 );
+
+                  cv::Point x ( faces[0].x-1, faces[0].y-1 );
+                  cv::Point y ( faces[0].x + faces[0].width+2, faces[0].y + faces[0].height+2 );
+                  cv::rectangle ( frame, x, y, cv::Scalar ( 240, 230, 200 ) );
+
+
+                  emit  faceChanged ( face );
+                }
+
+              QImage*  webcam = new QImage ( frame.data,
+                                             frame.cols,
+                                             frame.rows,
+                                             frame.step,
+                                             QImage::Format_RGB888 );
+
+              emit  webcamChanged ( webcam );
+
+            }
+
+          QThread::msleep ( 80 );
+
+        }
+
+      if ( ! videoCapture.isOpened() )
+        {
+          openVideoStream();
+        }
+
+    }</programlisting></para>
+        <para>Az első while ciklus 50ms-re le fog állni. A második while ciklus a képkockákat fogja
+            betölteni egyesével a read függvény segítségével. Ez a ciklus addig fog futni, amíg
+            tudunk képkockát beolvasni. A feltételes utasítás valahogy így néz ki: amíg a frame nem
+            üres, addig a beolvasott képkockát újraméretezzük, valamint az INTER_CUBIC nevű
+            interpolációs metódussal interpoláljuk. A cv::Mat metódussal a face adatokat fogjuk
+            szűrni és az első ilyen adatból egy QIMAGE objektumot építünk fel. A faceChanged az emit
+            miatt egy signalt fog küldeni, és frissíti az arcot a face adatokkal, majd a
+            webcamChanged szintén egy signált küld, ezért a webcam képe frissülni fog, és 80ms-re
+            leállítja a ciklust. Amint elfogynak a képkockák, kilépünk a ciklusból, és ha nincs
+            elindítva a videoCapture, akkor elindítjuk.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/samucam.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Ééés a futtatásról készült kép, amelyen a telefon vakujával kellett megvilágítanom a
+            fejem, mert valami fekete mágia folytán semmit nem lehet a webkamerámon látni
+            felkapcsolt villany alatt. :D</para>
+    </section>
+    <section>
+        <title>BrainB</title>
+        <para>A BrainB projekt egy olyan játékról szól, melyben egy Samuentropy nevű, mozgó
+            objektumon kell tartanunk az egérmutatót. Ez elsőre egyszerűnek tűnik, viszont amíg
+            rajta tartjuk az egeret, egyre több másik mozgó objektum jelenik meg, és sokszor le is
+            fedik Samut, illetve egyre gyorsabb a mozgás is. Samu elvesztése esetén elkezdenek
+            törlődni illetve lassulni az objektumok.</para>
+        <para>Feladatunk az volt, hogy miután felélesztettük a projektet, a Qt slot-signal
+            mechanizmus működését fejtsük ki a programban.</para>
+        <para>Először ejtsünk pár szót magáról a mechanizmusról.</para>
+        <para>A Qt-t a slot-signal mechanizmus teszi egyedivé. Ez a mechanizmus a callback
+            függvények összerendelését teszi lehetővé. A Qt-ban az objektumok signalokat küldhetnek,
+            melyek akkor kerülnek elküldésre, hogyha az adott objektummal valami történik. Az
+            objektumoknak viszont Qt-ban vannak slotjai is, ezek tagfüggvények, melyek arra
+            figyelnek, ha egy másik objektum signalt küld, vagyis ezek a függvények a signal
+            elküldése után hívódnak meg.</para>
+        <para>A slotokat köthetjük signalokhoz is, ami annyit tesz, hogy egy slot csak egy adott
+            signal-ra fog figyelni. Az összekötés a connect függvénnyel történik, melynek
+            szintaktikája a következő: connect (objektum_1, signal, objektum_2).</para>
+        <para>A signalok akkor is elküldődnek, ha nincs hozzájuk kötve slot.</para>
+        <para>A BrainBWin.cpp BrainBWin objektum konstruktorában megtalálható a következő
+            kódcsipet:<programlisting>connect ( brainBThread, SIGNAL ( heroesChanged ( QImage, int, int ) ),
+                  this, SLOT ( updateHeroes ( QImage, int, int ) ) );
+
+        connect ( brainBThread, SIGNAL ( endAndStats ( int ) ),
+                  this, SLOT ( endAndStats ( int ) ) );</programlisting></para>
+        <para>Ezen két connect függvényben jól látható a fentebb már említett szintaktika. A felső
+            annyit tesz, hogy a brainBThread objektumban ha a hősök pozíciója megváltozik, azaz a
+            heroesChanged függvény meghívódik, akkor szintén a brainBThread objektumban az
+            updateHeroes függvénynek meg kell hívódnia, hogy a hősök pozíciója megváltozzon.</para>
+        <para>Az alsó függvény pedig azt csinálja, hogyha az endAndStats függvény meghívódik,
+            elküldi a jelet lényegében saját magának, és meghívja megint az endAndStats függvényét,
+            amely ha a forráskódban megnézzük, láthatjuk, hogy kilép a programból.</para>
+        <programlisting>void BrainBWin::endAndStats ( const int &amp;t )
+{
+
+        qDebug()  &lt;&lt; "\n\n\n";
+        qDebug()  &lt;&lt; "Thank you for using " + appName;
+        qDebug()  &lt;&lt; "The result can be found in the directory " + statDir;
+        qDebug()  &lt;&lt; "\n\n\n";
+
+        save ( t );
+        close();
+}</programlisting>
+        <para>A futásról egy kép:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/brainb.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+    </section>
+    
+    
+</chapter>
+
+
+

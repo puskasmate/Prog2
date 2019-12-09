@@ -1,0 +1,435 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Caesar!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title><type>double **</type> háromszögmátrix</title>
+        <para>Forrás: <link
+                xlink:href="https://gitlab.com/puskasmate/bhax/blob/master/thematic_tutorials/bhax_textbook/Caesar/tm.c"
+            /></para>
+        <para>
+            <programlisting>int
+main ()
+{
+    int nr = 5;
+    double **tm;
+    
+    printf("%p\n", &amp;tm);</programlisting>
+        </para>
+        <para>Programunk azzal kezdődik, hogy megadjuk a sorok számát, majd lefoglalunk 8 byte-nyi
+            helyet a memóriűban a "tm" számára. Ezután az eslő byte címét printf függvény
+            használatával
+            kiíratjuk.<programlisting>if ((tm = (double **) malloc (nr * sizeof (double *))) == NULL)
+    {
+        return -1;
+    }
+
+printf("%p\n", tm);</programlisting></para>
+        <para>A malloc függvény segítségével 40 byte-nyi (5*8) helyet lefoglal az operációs rendszer
+            a memóriában. A malloc függvény viszont egy void mutatót ad vissza erre a lefoglalt
+            memóriára, ezért a típusát "double **"-ra kényszerítjük. Ha eredményül 0-t kapunk, az
+            azt jelenti, hogy nem tudott kellő mennyiségű helyet lefoglalni, így kilépünk a
+            programból. Ezután a tm-ben a malloc függvény által visszaadott értéket
+            kiíratjuk.</para>
+        <programlisting>for (int i = 0; i &lt; nr; ++i)
+    {
+        if ((tm[i] = (double *) malloc ((i + 1) * sizeof (double))) == NULL)
+        {
+            return -1;
+        }
+
+    }</programlisting>
+        <para>Ezután a malloc függvény használatával soronként lefoglalunk n*8byte-nyi helyet, és
+            "double*"-ra kényszerítjük a visszakapott értéket. Ha nem bírt lefoglalni annyi memóriát
+            amennyit kellett volna -1-gyel tér vissza, vagyis kilép a program.</para>
+        <programlisting>printf("%p\n", tm[0]);    
+    
+    for (int i = 0; i &lt; nr; ++i)
+        for (int j = 0; j &lt; i + 1; ++j)
+            tm[i][j] = i * (i + 1) / 2 + j;
+
+    for (int i = 0; i &lt; nr; ++i)
+    {
+        for (int j = 0; j &lt; i + 1; ++j)
+            printf ("%f, ", tm[i][j]);
+        printf ("\n");
+    }
+
+    tm[3][0] = 42.0;
+    (*(tm + 3))[1] = 43.0;	
+    *(tm[3] + 2) = 44.0;
+    *(*(tm + 3) + 3) = 45.0;
+
+    for (int i = 0; i &lt; nr; ++i)
+    {
+        for (int j = 0; j &lt; i + 1; ++j)
+            printf ("%f, ", tm[i][j]);
+        printf ("\n");
+    }
+
+    for (int i = 0; i &lt; nr; ++i)
+        free (tm[i]);
+
+    free (tm);
+
+    return 0;
+}</programlisting>
+        <para>A program több részében a háromszög mátrix elemeit határozzuk meg és íratjuk
+            ki.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="Caesar/teszt.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>A program kipróbálása.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="Caesar/memoriakezeles.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>A memóriakezelés szemléltetésére készült ábra.</para>            
+    </section>        
+    <section>
+        <title>C EXOR titkosító</title>
+        <para>Forrás: <link
+                xlink:href="https://gitlab.com/puskasmate/bhax/blob/master/thematic_tutorials/bhax_textbook/Caesar/e.c"
+            /></para>
+        <para>
+            <programlisting>#include &lt;stdio.h>
+#include &lt;unistd.h>
+#include &lt;string.h></programlisting>
+        </para>
+        <para>Programunkat a szükséges header-ök meghívásával kezdjük.</para>
+        <programlisting>#define MAX_KULCS 100
+#define BUFFER_MERET 256</programlisting>
+        <para>Meghatározunk két értéket, amelyet a MAX_KULCS és BUFFER_MERET helyeken fogunk
+            haszálni.</para>
+        <programlisting>int
+main (int argc, char **argv)
+{
+
+  char kulcs[MAX_KULCS];
+  char buffer[BUFFER_MERET];</programlisting>
+        <para>Main programunk azzal kezdődik, hogy deklarálunk két karakter típusú tömböt, és
+            elemeinek számát beállítjuk a fentebb definiált értékekre. Ezzel a kulcs és a beolvasott
+            bájtok maximális számát határoztuk meg.</para>
+        <programlisting>int kulcs_index = 0;
+int olvasott_bajtok = 0;</programlisting>
+        <para>Az olvasott bájtok számát, és a kulcs index tárolására használt változót
+            kinullázzuk.</para>
+        <programlisting>int kulcs_meret = strlen (argv[1]);
+strncpy (kulcs, argv[1], MAX_KULCS);</programlisting>
+        <para>A kulcs mértetét úgy kapjuk, hogy megnézzük az első parancssori argumentum hosszát,
+            ugyanis az első parancssori argumentumban adjuk meg a kulcsot. Eztután a kulcs nevű
+            tömbünkbe belemásoljuk az első parancssori argumentum byte-jait, ez maximum MAX_KULCS
+            byte-ot jelenthet.</para>
+        <programlisting> while ((olvasott_bajtok = read (0, (void *) buffer, BUFFER_MERET)))
+    {
+
+      for (int i = 0; i &lt; olvasott_bajtok; ++i)
+	{
+
+	  buffer[i] = buffer[i] ^ kulcs[kulcs_index];
+	  kulcs_index = (kulcs_index + 1) % kulcs_meret;
+
+	}
+
+      write (1, buffer, olvasott_bajtok);
+
+    }
+}</programlisting>
+        <para>While ciklusunk addig fog futni, amíg a beolvasott bájtok száma el nem éri szöveg
+            méretét, amelyet a read() függvény segítségével állapítunk meg, ugyanis ez a függvény a
+            beolvasott byte-ok számát adja vissza. A for ciklusunkban végigmegyünk a beolvasott
+            byte-okon és elvégezzük a kulcstól függően a titkosítást. A write() függvényünk a
+            titkosított szöveget fogja byteonként (max "olvasott_bajtok" byte-ot fog beolvasni)
+            beleírni a buffer tömbbe.</para>            
+    </section>        
+    <section>
+        <title>Java EXOR titkosító</title>
+        <para>Forrás: <link
+                xlink:href="https://gitlab.com/puskasmate/bhax/blob/master/thematic_tutorials/bhax_textbook/Caesar/ExorTitkosito.java"
+            /></para>
+        <programlisting>public static void ExorTitkosito(String kulcsSzoveg,java.io.InputStream bejovoCsatorna,java.io.OutputStream kimenoCsatorna) throws java.io.IOException {</programlisting>
+        <para>Javaban megírt programunk kezdetén megadjuk, hogy szükségünk lesz egy kulcsra, egy
+            bementei fájlra/szöbegre és egy kimeneti fájlra.</para>
+        <programlisting>while(olvasottBajtok!= -1){
+
+ for(int i=0; i&lt;olvasottBajtok; ++i) {
+
+ buffer[i] = (byte)(buffer[i] ^ kulcs[kulcsIndex]);
+ kulcsIndex = (kulcsIndex+1) % kulcs.length;
+
+ }</programlisting>
+        <para>While ciklusunk itt is addig megy, míg be nem olvastuk az összes byte-ot. Ugyanúgy
+            betöltjük az összeexorozott byte-okat a buffer tömbbe. Az exor művelet itt is a kulcs
+            segítségével történik.</para>
+        <programlisting>kimenoCsatorna.write(buffer, 0, olvasottBajtok);
+ olvasottBajtok=bejovoCsatorna.read(buffer);
+ }
+ 
+}</programlisting>
+        <para>Itt meghatározzuk, hogy a buffer tömb elemeit (olvasottBajtok-ig) írja bele egy
+            kimeneti fájlba. Az olvasottBajtok-at pedig a bejovoCsatorna-l olvassuk be a
+            buffer-be.<programlisting>public static void main(String[] args) {
+
+ try {
+
+ ExorTitkosito(args[0], System.in, System.out);
+
+ } catch(java.io.IOException e) {
+
+ e.printStackTrace();
+
+ }
+
+ }</programlisting></para>
+        <para>Itt pedig megnézzük, hogy a megfelelő argumentumokat kapott e a program, ha nem,
+            jelezzük a felhasználó felé.</para>            
+    </section>        
+    <section>
+        <title>C EXOR törő</title>
+        <para>Forrás: <link
+                xlink:href="https://gitlab.com/puskasmate/bhax/blob/master/thematic_tutorials/bhax_textbook/Caesar/t.c"
+            /></para>
+        <programlisting>#define MAX_TITKOS 4096
+#define OLVASAS_BUFFER 256
+#define KULCS_MERET 8
+#define _GNU_SOURCE
+
+#include &lt;stdio.h>
+#include &lt;unistd.h>
+#include &lt;string.h></programlisting>
+        <para>A programunk bizonyos részek definiálásával, és a szükséges header-ök meghívásával
+            kezdődik.</para>
+        <programlisting>double
+atlagos_szohossz (const char *titkos, int titkos_meret)
+{
+  int sz = 0;
+  for (int i = 0; i &lt; titkos_meret; ++i)
+    if (titkos[i] == ' ')
+      ++sz;
+
+  return (double) titkos_meret / sz;
+}</programlisting>
+        <para>Ez a függvény a szavak átlagos hosszát adja vissza értélkül. Ezt úgy kapjuk, hogy a
+            szavak számának felveszünk egy változót, amit kezdetben kinullázunk. Majd a beolvasott
+            karaktereken egyesével egy for ciklus segítségével végig megyünk, és ha szóközt
+            találtunk, a szavak számához hozzáadunk egyet. Ezután a szavak átlagos hosszát a bekért
+            szöveg méretének és a szavak számának hányadosa adja.</para>
+        <programlisting>int
+tiszta_lehet (const char *titkos, int titkos_meret)
+{
+ 
+
+  double szohossz = atlagos_szohossz (titkos, titkos_meret);
+
+  return szohossz > 6.0 &amp;&amp; szohossz &lt; 9.0
+    &amp;&amp; strcasestr (titkos, "hogy") &amp;&amp; strcasestr (titkos, "nem")
+    &amp;&amp; strcasestr (titkos, "az") &amp;&amp; strcasestr (titkos, "ha");
+
+}
+</programlisting>
+        <para>Következő függvényünk megnézi, hogy az adott szövegben van e titkosítatlan szövegrész.
+            Ha az átlagos szóhossz 6 és 9 közé elsik, és talál benne "hogy", "nem", "az", "ha"
+            szavakat, akkor visszaad egy true értéket.</para>
+        <programlisting>void
+exor (const char kulcs[], int kulcs_meret, char titkos[], int titkos_meret)
+{
+
+  int kulcs_index = 0;
+
+  for (int i = 0; i &lt; titkos_meret; ++i)
+    {
+
+      titkos[i] = titkos[i] ^ kulcs[kulcs_index];
+      kulcs_index = (kulcs_index + 1) % kulcs_meret;
+
+    }
+
+}</programlisting>
+        <para>Az "exor" függvényben történik a szöveg és a kulcs összeexorozása, majd a kulcson
+            lépkedünk.</para>
+        <programlisting>int
+exor_tores (const char kulcs[], int kulcs_meret, char titkos[],
+	    int titkos_meret)
+{
+
+  exor (kulcs, kulcs_meret, titkos, titkos_meret);
+
+  return tiszta_lehet (titkos, titkos_meret);
+
+}</programlisting>
+        <para>Az "exor_tores"-ben meghívjuk a fentebb definiált "exor" függvényünket, majd a
+            "tiszta_lehet" függvényt hívjuk meg a titkos szövegre, és ennek a függvénynek az értékét
+            fogjuk visszaadni.</para>
+        <programlisting>int
+main (void)
+{
+
+  char kulcs[KULCS_MERET];
+  char titkos[MAX_TITKOS];
+  char *p = titkos;
+  int olvasott_bajtok;
+
+  // titkos fajt berantasa
+  while ((olvasott_bajtok =
+	  read (0, (void *) p,
+		(p - titkos + OLVASAS_BUFFER &lt;
+		 MAX_TITKOS) ? OLVASAS_BUFFER : titkos + MAX_TITKOS - p)))
+    p += olvasott_bajtok;</programlisting>
+        <para>A while ciklusunkban olvassuk be a titkos fájlt
+            byteonként.<programlisting>for (int i = 0; i &lt; MAX_TITKOS - (p - titkos); ++i)
+    titkos[p - titkos + i] = '\0';</programlisting></para>
+        <para>A titkos bufferben a megmaradt helyeket
+            kinullázzuk.<programlisting> for (int ii = '0'; ii &lt;= '9'; ++ii)
+    for (int ji = '0'; ji &lt;= '9'; ++ji)
+      for (int ki = '0'; ki &lt;= '9'; ++ki)
+	for (int li = '0'; li &lt;= '9'; ++li)
+	  for (int mi = '0'; mi &lt;= '9'; ++mi)
+	    for (int ni = '0'; ni &lt;= '9'; ++ni)
+	      for (int oi = '0'; oi &lt;= '9'; ++oi)
+		for (int pi = '0'; pi &lt;= '9'; ++pi)
+		  {
+		    kulcs[0] = ii;
+		    kulcs[1] = ji;
+		    kulcs[2] = ki;
+		    kulcs[3] = li;
+		    kulcs[4] = mi;
+		    kulcs[5] = ni;
+		    kulcs[6] = oi;
+		    kulcs[7] = pi;
+</programlisting></para>
+        <para>Egymásba ágyazott for ciklusok segítségével az összes lehetséges kulcsot
+            előállítjuk.</para>
+        <programlisting> if (exor_tores (kulcs, KULCS_MERET, titkos, p - titkos))
+		      printf
+			("Kulcs: [%c%c%c%c%c%c%c%c]\nTiszta szoveg: [%s]\n",
+			 ii, ji, ki, li, mi, ni, oi, pi, titkos);
+
+		    // ujra EXOR-ozunk, igy nem kell egy masodik buffer  
+		    exor (kulcs, KULCS_MERET, titkos, p - titkos);
+		  }
+
+  return 0;
+}</programlisting>
+        <para>A feltételes utasításunkban igénybe vesszük az "exor_tores" függvényünket, mellyel a
+            lehetséges kulcsok mindegyikét kipróbáljuk, és megvizsgáljuk, hogy valamelyik kulccsal
+            visszakapjuk e a tiszta szöveget, ha igen, ezt a kulcsot és a tiszta szöveget
+            kiíratjuk.</para>            
+    </section>        
+    <section>
+        <title>Neurális OR, AND és EXOR kapu</title>
+        <programlisting>library(neuralnet)
+
+a1    &lt;- c(0,1,0,1)
+a2    &lt;- c(0,0,1,1)
+OR    &lt;- c(0,1,1,1)
+
+or.data &lt;- data.frame(a1, a2, OR)</programlisting>
+        <para>Programunk azzal keződik, hogy a neuralnet nevű csomagot meghívjuk, majd 3 vektort
+            hozunk létre. Ennek elemei azért helyezkednek el ilyen sorrendben, mert az OR vektorban
+            az a1 és a2 értékeinek logikai vagy alapján kiértékelt értéke látható. (0 vagy 0=0, 1
+            vagy 0=1 stb stb) Majd a következő sorban ebből a 3 vektorból adatot csinálunk.</para>
+        <programlisting>nn.or &lt;- neuralnet(OR~a1+a2, or.data, hidden=0, linear.output=FALSE, stepmax = 1e+07, threshold = 0.000001)
+</programlisting>
+        <para>A "neuralnet" függvény használatával állítjuk elő a neurális hálót, amely beállítja a
+            súlyokat. A súlyokat matematikai műveletek segítségével határoztuk meg. Ezáltal a gép
+            "megtanulta" a logikai vagy művelet értékét.</para>
+        <programlisting>plot(nn.or)
+
+compute(nn.or, or.data[,1:2])
+</programlisting>
+        <para>Majd a compute paranccsal beadjuk neki az értékeket.</para>
+        <programlisting>a1    &lt;- c(0,1,0,1)
+a2    &lt;- c(0,0,1,1)
+OR    &lt;- c(0,1,1,1)
+AND   &lt;- c(0,0,0,1)
+
+orand.data &lt;- data.frame(a1, a2, OR, AND)
+</programlisting>
+        <para>Következő lépésekben a logikai és műveletre fogjuk megtanítani a gépet. Ehhez ismét
+            előre meghatározzuk a művelet értékeit, majd adatot képzünk belőle.</para>
+        <programlisting>nn.orand &lt;- neuralnet(OR+AND~a1+a2, orand.data, hidden=0, linear.output=FALSE, stepmax = 1e+07, threshold = 0.000001)
+</programlisting>
+        <para>Ahogyan pár sorral fentebb, ismét itt történik a "tanítás".</para>
+        <programlisting>plot(nn.orand)
+
+compute(nn.orand, orand.data[,1:2])</programlisting>
+        <para>Itt pedig a rajzolás és az értékek
+            átadása.<programlisting>a1      &lt;- c(0,1,0,1)
+a2      &lt;- c(0,0,1,1)
+EXOR    &lt;- c(0,1,1,0)
+
+exor.data &lt;- data.frame(a1, a2, EXOR)
+
+nn.exor &lt;- neuralnet(EXOR~a1+a2, exor.data, hidden=0, linear.output=FALSE, stepmax = 1e+07, threshold = 0.000001)
+
+plot(nn.exor)
+
+compute(nn.exor, exor.data[,1:2])</programlisting></para>
+        <para>Ebben a részben pedig az exor műveletre szeretnénk megtanítani a gépet. Ez viszont
+            ezzel a módszerrel nem sikerülhet. Ugyanis a súlyok értéke rendre 0.5 körüli értékek,
+            így nem kapunk pontos megközelítést, hogy arra az értékre 0 vagy 1 értéket kell
+            visszaadnia.</para>
+        <programlisting>a1      &lt;- c(0,1,0,1)
+a2      &lt;- c(0,0,1,1)
+EXOR    &lt;- c(0,1,1,0)
+
+exor.data &lt;- data.frame(a1, a2, EXOR)
+
+nn.exor &lt;- neuralnet(EXOR~a1+a2, exor.data, hidden=2, linear.output=FALSE, stepmax = 1e+07, threshold = 0.000001)
+
+plot(nn.exor)
+
+compute(nn.exor, exor.data[,1:2])
+</programlisting>
+        <para>Ezzel a módszerrel viszont képesek vagyunk exor műveletre megtanítani a gépet. Ebben a
+            módszerben 2 rejtett neuron segítségével tanítjuk meg a gépet az exor műveletre.</para>            
+    </section>        
+    <section>
+        <title>Hiba-visszaterjesztéses perceptron</title>
+        <para>Forrás: <link
+                xlink:href="https://gitlab.com/puskasmate/bhax/blob/master/thematic_tutorials/bhax_textbook/Caesar/main.cpp"
+            /></para>
+        <programlisting>#include &lt;iostream>
+#include "mlp.hpp"
+#include &lt;png++/png.hpp>
+
+int main(int argc, char **argv){
+png::image &lt;png::rgb_pixel> png_image (argv[1]);
+int size= png_image.get_width()*png_image.get_height();
+Perceptron* p= new Perceptron(3, size, 256, 1);</programlisting>
+        <para>A szükséges header-ök importálása után a main függvényünket egy kép létrehozásával
+            kezdjük, melynek a méretét az első parancssori argumentum értékével tesszük egyenlővé.
+            Ezután felveszünk egy változót, amely ennek a képnek a méretét fogja tárolni, ezt úgy
+            kapjuk meg, hogy a kép szélességét megszorozzuk a kép magasságával. Majd létrehozunk egy
+            perceptront, amelyet 3 rétegűre állítunk be, az első réteg méretét a kép valódi mérete
+            adja, a második réteg méretét 256-ra, a harmadik réteg méretét pedig 1-re állítjuk, ezt
+            a számot fogjuk
+            kiszámolni.<programlisting>double* image = new double[size];</programlisting></para>
+        <para>Az "image" nevű tömböt a kép pixeleinek hozzuk létre. A kép pixeleinek száma
+            megegyezik a kép méretével, ezért a tömb hossza a kép mérete lesz.</para>
+        <programlisting>for(int i{0};i&lt;png_image.get_width();++i)
+ for(int j{0};j&lt;png_image.get_height();++j)
+  image[i*png_image.get_width()+j] = png_image[i][j].red;</programlisting>
+        <para>Két for ciklus segítségével végigmegyünk a pixeleken, majd mindegy egyes piros pixelt
+            beletöltünk az "image" tömbünkbe.</para>
+        <programlisting>double value = (*p)(image); //A "p" mutató helyen tárolt perceptron objektumot ad vissza</programlisting>
+        <para>A "value" változó értéket úgy kapjuk meg, hogy a *p perceptront függvényként meghívjuk
+            erre az "image" tömbre. Ezzel betöltöttük a tömbünket a neurális hálóba, és egy -1 és 1
+            közötti értéket fogunk visszakapni súlyként.</para>
+        <programlisting>std::cout &lt;&lt; value &lt;&lt; std::endl;
+
+delete p;
+delete [] image;
+}</programlisting>
+        <para>Ezután kiíratjuk a neurális háló által visszaadott súlyt a standard kimenetre, majd
+            felszabadítjük a p perceptront és az image tömöböt.</para>            
+    </section>        
+        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+</chapter>                

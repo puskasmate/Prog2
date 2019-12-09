@@ -1,0 +1,260 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Chomsky!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>ENCODING</title>
+        <para>Feladatunk az volt, hogy küszöböljük ki a fordítási hibákat a linkelt
+            MandelbrotHalmazNagyító.java forráskódban.</para>
+        <para>A feladatban forrásként megadott zip letöltése után veszteséges tömörítésbe ütköztünk.
+            Az állományok neve ugyanis olvashatatlan, így első dolgunk az állományok átnevezése
+            volt.</para>
+        <para>A<programlisting>javac MandelbrotHalmazNagyító.java</programlisting></para>
+        <para>parancs kiadása után errorok sorát kapjuk vissza.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/nagyito.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Láthatjuk, hogy a fordító a kódolásra panaszkodik, ugyanis a javac alapból utf-8-as
+            betűkészletet használ, a forráskód betűkészlete tehát minden bizonnyal eltér ettől a
+            betűkészlettől.</para>
+        <para>Az ékezetes betűk viszont több nyelvben is megjelennek, illetve több betűkészlet is
+            engedi ezek használatát.</para>
+        <para>Tanár Úr által linkelt könyvben egy kevés keresés után megtalálható a példaprogram
+            leírása, és a következő kép nagyban leszűkíti a megfelelő betűkészlet
+            megtalálását:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandel_nagy.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Láthatjuk, hogy a fordításhoz és futtatáshoz szükséges parancs egy windows operációs
+            rendszerrel rendelkező gépen lett beütve, mivel ilyen fájlrendszer windows-ra
+            utal.</para>
+        <para> Rövid keresés után megtaláltam a windows által használt betűkészleteket, és azt
+            találtam, hogy a windows-1252 a Latin 1-es betűkészlettel egyezik meg, amely tartalmazza
+            az általunk használt ékezetes betűket. A megoldás tehát egyszerű, a javac után egy
+            kapcsolóval megadjuk a kódolás típusát a
+            következőképp:<programlisting>javac -encoding windows-1252 MandelbrotHalmazNagyító.java</programlisting></para>
+        <para>A futásról készült kép:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/mandel_fut.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+    </section>
+    <section>
+        <title>l334d1c4^5</title>
+	<para>Megoldás forrása:</para>
+        <para>A Leet olyan eljárás, amikor az írott angol szöveg karaktereit más ASCII készletű
+            karakterekkel helyettesítjük. A leetspeak eredetileg az illegális tevékenykedők
+            nyelveként funkcionált.</para>
+        <para>A leetspeak használatával az adott szöveget a keresők nem találták meg, és a
+            megszokottól eltérő karakterhasználat miatt az illetéktelenek nem is tudták értelmezni a
+            szöveget.</para>
+        <para>Korábban Prog1 során már megjelent a leet, viszont akkor egy lexer fájlként kellett a
+            forráskódot értelmeznünk. A mostani feladatban nem .l kiterjesztésű állományt kellett
+            felhasználnunk, hanem egy konvertáló programot kellett írnunk C++ vagy Java nyelven, és
+            a program egy osztályként kellett hogy tartalmazza a leet-et.</para>
+        <para>Nézzük is a futásról készült képet:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/leet.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Maga a forráskód
+            pedig:<programlisting>public class Leet {
+    public static void main(String[] args) throws Exception{
+        if(args.length != 2){
+            System.out.println("usage: Leet input_file_name output_file_name");
+            System.exit(-1);
+        }</programlisting></para>
+        <para>A Leet osztály létrehozása után a main-ben a usage függvény tartalma, jelen esetben a
+            használata jelenik meg a felhasználó előtt abban az esetben, ha rosszul futtatná a
+            programot.</para>
+        <programlisting>java.io.FileReader file = new java.io.FileReader(args[0]);
+        java.io.FileWriter fw = new java.io.FileWriter(args[1]);
+        LeetCipher lc = new LeetCipher();</programlisting>
+        <para>Létrehozunk egy file változót, amibe az argumentumként adott 0. elem (input)-ból
+            olvasunk, majd egy fw változót, ami pedig az első elembe (kimenet) fog írni. Ezután egy
+            LeetCipher osztályú lc változót fogunk inicializálni. Az osztály definiálása lentebb
+            látható.<programlisting>int k = 0;
+        while ((k=file.read()) != -1) {
+            fw.write(lc.chiper((int)Character.toUpperCase((char)k)));
+        }
+        file.close();
+        fw.close();
+    }
+}</programlisting></para>
+        <para>Létrehozunk egy k változót, ez elején int típusú, majd egy while függvény következik,
+            ez nagyjából úgy néz ki, hogy amíg a read függvény képes olvasni a bemenetről, addig a
+            kimenetre írunk, méghozzá a következőképpen: az lc-re meghívjük az osztály chiper
+            változóját, ennek paraméterül a k karakter nagybetűs változatát adjuk, melyet int
+            típusúvá kényszerítünk, a toUpperCase függvénynek paraméterül adott k értéket pedig char
+            típusúvá kényszerítjük. Amikor már nem tud olvasni, az inputot és outputot is
+            lezárjuk.</para>
+        <programlisting>class LeetCipher {
+    private String[] leetchars = new String[]{
+            "4","8","&lt;","[)","3","|=","6","|-|","1","_|","|&lt;","|","|V|","|\\|","O",
+            "|>","0.","|2","5","7","|_|","\\/","\\X/","}{","`/","2"
+    };</programlisting>
+        <para>Jöhet a LeetChipher osztály megadása. A leetchars string típusú tömb a helyettesítő
+            karaktereket fog tartalmazni, melyek az angol abc betűinek feleltehetők
+            meg.<programlisting>private String[] leetnums = new String[]{
+            "O","I","Z","E","A","S","G","T","B","g"
+    };</programlisting></para>
+        <para>A leetnums tömb pedig rendre a 0-9 számjegyek helyettesítőértékei lesznek.</para>
+        <para>
+            <programlisting>public String chiper(int ch) {
+        if (ch >= 65 &amp;&amp; ch &lt;= 90){
+            return leetchars[ch - 65];
+        }
+        else if (ch >= 48 &amp;&amp; ch &lt;= 57){
+            return leetnums[ch - 48];
+        }
+        else {
+            return String.valueOf((char)ch);
+        }
+    }
+}</programlisting>
+        </para>
+        <para>A chiper függvény arra fog rávizsgálni, hogy a beolvasott karakter számjegy, betű,
+            vagy egyéb karakter e. Ha a ch értéke 65 és 90 között van, akkor betű lesz az értéke,
+            mivel az angol abc nagybetűinek decimális értéke 65-től kezdődik (A), és 90-nél végződik
+            (Z). Ebben az esetben a leetchars függvényből fogja a megfelelő stringet visszaadni. Ezt
+            úgy kell elképzelni, hogy vegyük pl. az "M" betűt. Az M betű értéke 77 lesz. Ha a 77-ből
+            kivonunk 65-öt, akkor 12-t kapunk, tehát a leetchars tömb 12. elemét fogja a függvény
+            visszaadni, ami a "|V|". Ha 48 és 57 között van a beolvasott karakter értéke, akkor a
+            beolvasott karakter számjegy, mivel a 0 értéke 48, a 9 értéke pedig 57. Ekkor a leetnums
+            tömb elemei közül kapjuk vissz a megfelelő elemet, működése megegyezik a karakterek
+            beolvasásával, viszont itt a 65 helyett 48-at vonunk ki, mivel a számjegyek decimális
+            értéke 48-től kezdődik.</para>
+        <para>Amennyiben a beolvasott karakter sem nem szám, sem nem betű, akkor a visszaadjuk az
+            eredeti értékét, mely jelen esetben úgy történik, hogy a decimális alakját átkonvertálja
+            karakterré.</para>
+    </section>
+    <section>
+        <title>Full screen</title>
+        <para>Feladatunk az volt, hogy írjunk javaban egy teljes képernyős programot. Ehhez tippként
+            Tanár Úr által linkelt labirintus játékot kaptuk, ezt fogjuk átnézni.</para>
+        <para>Letöltéskor ugyanabba a problémába ütköztünk, mint az Encoding feladatnál, így a
+            fájlneveket itt is át kell írnunk, hogy olvashatóak legyenek.</para>
+        <para>A programot sikeresen felélesztettem, viszont ez csak egy terminálba kirajzolós 2D-s
+            program:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/labjatek.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Következő lépés tehát a full screen-es változat lesz. Ehhez a
+            LabirintusVilágOsztály.java állományra lesz szükségünk.</para>
+        <para>Az állományt sikeresen fordítottam illetve futtattam, viszont fehér képernyőt kaptam,
+            amit sajnos egy rendszer újraindítás követett, ugyanis semmit nem érzékelt a gép, de
+            legalább az előző feladatot el sem mentettem így újra kellett kezdenem (: .</para>
+        <programlisting>public void képErőforrásokBetöltése(java.awt.GraphicsConfiguration 
+            graphicsConfiguration) {
+        
+        falKép = kompatibilisKép("fal.png", graphicsConfiguration);
+        járatKép = kompatibilisKép("járat.png", graphicsConfiguration);
+        hősKép = kompatibilisKép("hős.png", graphicsConfiguration);
+        szörnyKép = kompatibilisKép("szörny.png", graphicsConfiguration);
+        kincsKép = kompatibilisKép("kincs.png", graphicsConfiguration);
+        
+    }</programlisting>
+        <para>Ez a pár sor döbbentett rá hogy kéne pár képfájl..</para>
+        <para>Miután beszereztem a szükséges képfájlokat, a program probléma nélkül futott.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/labgyoz.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>A forráskód számunkra a teljes képernyős mód miatt fontos. A full screen-ért a
+            teljesKépernyősMód függvény a felelős. De mindenek előtt nézzük meg, hogy történik a
+            monitorunk
+            beállítása:<programlisting>/* Teljes képernyős módba próbálunk váltani. */
+        // A lokális grafikus környezet elkérése
+        java.awt.GraphicsEnvironment graphicsEnvironment
+                = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
+        // A grafikus környzetből a képernyővel dolgozunk
+        graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();</programlisting></para>
+        <para>A java.awt.GraphicsEnvironment a GraphicsDevice objektumok, vagyis a rendelkezésre
+            álló grafikus eszközök gyűjteménye lesz. Ezt a getLocalGraphicsEnvirtonment függvény
+            meghívásával érhetjük el, és a graphicsEnvironment nevű változóban fogjuk tárolni. A
+            graphicsDevice változó értékét beállítjuk az alapértelmezett ScreenDevice-ra, vagyis a
+            monitorunkra.</para>
+        <para>
+            <programlisting>boolean fullScreenTamogatott = graphicsDevice.isFullScreenSupported();</programlisting>
+        </para>
+        <para>Egy boolean változóba lekérdezzük, hogy támogatja e a kijelzőnk a full screen-t. A
+            graphichDevice a forráskód elején kerül
+            beállítasra:<programlisting>// A fullscreenbe kapcsoláshoz
+    java.awt.GraphicsDevice graphicsDevice;
+    // A megjelenítéshez
+    java.awt.image.BufferStrategy bufferStrategy;</programlisting></para>
+        <para>Eztán a fullScreenTamogatott függvényt kell megvizsgálnunk.</para>
+        <para>
+            <programlisting>if(fullScreenTamogatott) {
+            graphicsDevice.setFullScreenWindow(this);
+            // az aktuális képernyő jellemzök (szélesség, magasság, színmélység,
+            // frissítési frekvencia) becsomagolt elkérése
+            java.awt.DisplayMode displayMode
+                    = graphicsDevice.getDisplayMode();
+            // és kiíratása
+            szélesség = displayMode.getWidth();
+            magasság = displayMode.getHeight();
+int színMélység = displayMode.getBitDepth();
+            int frissítésiFrekvencia = displayMode.getRefreshRate();
+            System.out.println(szélesség
+                    + "x"  + magasság
+                    + ", " + színMélység
+                    + ", " + frissítésiFrekvencia);</programlisting>
+        </para>
+        <para>A függvényben megvizsgáljuk, hogy a grafikus megjelenítőnk támogatja e a
+            teljesképernyős módot. Ha igen, akkor a setFullScreenWindows a megadott képernyőre,
+            jelen esetben a graphicsDevice-ra hívódik meg. A java.awt.DisplayMode az adott grafikus
+            eszköz megjelenítési módjait kéri le, szélességet, magasságot és színmélységet illetve
+            frissítési
+            frekvenciát.<programlisting>java.awt.DisplayMode[] displayModes
+                    = graphicsDevice.getDisplayModes();
+            // Megnézzük, hogy támogatja-e az 1024x768-at, mert a
+            // példa játékunkhoz ehhez a felbontáshoz készítettük a képeket
+            boolean dm1024x768 = false;
+            for(int i=0; i&lt;displayModes.length; ++i) {
+                if(displayModes[i].getWidth() == 1024
+                        &amp;&amp; displayModes[i].getHeight() == 768
+                        &amp;&amp; displayModes[i].getBitDepth() == színMélység
+                        &amp;&amp; displayModes[i].getRefreshRate() 
+                        == frissítésiFrekvencia) {
+                    graphicsDevice.setDisplayMode(displayModes[i]);
+                    dm1024x768 = true;
+                    break;
+                }
+                
+            }
+if(!dm1024x768)
+                System.out.println("Nem megy az 1024x768, de a példa képméretei ehhez a felbontáshoz vannak állítva.");
+            
+        } else {
+            setSize(szélesség, magasság);
+            validate();
+            setVisible(true);
+        }
+        
+        createBufferStrategy(2);
+        
+        bufferStrategy = getBufferStrategy();
+        
+    }</programlisting></para>
+        <para>A displayModes tömbbe beletöltjük a lehetséges megjelenítési felbontásokat, majd
+            megnézzük, hogy az 1024x768-as felbontás támogatott e. Ezt úgy tesszük, hogy egy for
+            ciklust indítunk, mely végigzongorázik a displayModes elemein, és megvizsgálja, hogy a
+            szélesség és magasság és színmélység és képfrissítési ráta megegyezik e az adott
+            értékekkel, ha igen, beállítjuk a felbontást 1024x768-ra, ha nem, kiíratjuk, hogy nem
+            sikerült 1024x768-as felbontással a megjelenítés. </para>
+    </section>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+</chapter>                

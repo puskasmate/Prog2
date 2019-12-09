@@ -1,0 +1,231 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Stroustrup!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>JDK Osztályok</title>
+        <para>Feladat forrása:</para>
+        <para>Feladatunk az volt, hogy írjunk olyan boost C++ programot, amely kilistázza, hogy hány
+            darab .java kiterjesztésű állomány (java osztály) van a jdk forrásaiban található
+            src.zip állományban.</para>
+        <para>Ehhez a korábbi prog1-es kurzus fénykard nevű forráskódjából kellett felhasználnunk
+            egy
+            függvényt.<programlisting>void read_file ( boost::filesystem::path path,int &amp;szamlalo )
+{
+
+        if ( is_regular_file ( path ) ) {
+
+                string ext ( ".java" );
+                if ( !ext.compare ( boost::filesystem::extension ( path ) ) ) {
+
+                        string actjavaspath = path.string();
+                    size_t end = actjavaspath.find_last_of ( "/" );
+                    string act = actjavaspath.substr ( 0, end );
+
+                        
+                        szamlalo++;
+
+                }
+
+        } else if ( is_directory ( path ) )
+                for ( boost::filesystem::directory_entry &amp; entry : boost::filesystem::directory_iterator ( path ) )
+                        read_file ( entry.path(), szamlalo );
+
+}</programlisting></para>
+        <para>A függvény fentebb látható. Lényegében megegyezik a fenykard.cpp read_acts
+            függvényével, viszont az ext stringet át kell írnunk, hogy .java végződésű állományokra
+            alkalmazzuk a keresést. Ez a függvény benéz a mappákba, és a java állományokat
+            kilistázza, valamint a szamlalo valtozónk miatt meg is számolja azokat. Jöhet is a main
+            függvény:<programlisting>int main( int argc, char *argv[])
+{
+    
+    char* filename=argv[1];
+    string str = "mkdir "; 
+    string str2 = "cd ";
+    string str3 = "unzip /usr/lib/jvm/openjdk*/src.zip -d ";
+    
+    str = str + filename; 
+    str2 = str2 + filename;
+    
+   str3 = str3 + filename+"/";</programlisting></para>
+        <para>Egy char változóba eltároljuk a parancssori argumentumként kapott első elemet, ez egy
+            mappanév lesz, ugyanis a program futtatásakor meg kell adnunk egy mappanevet, ahová ki
+            szeretnénk csomagolni az src.zip-et.</para>
+        <para>Miután stringekbe írtuk a szükséges rendszerutasításokat, a stringek végéhez
+            hozzácsatoljuk a filename változót, amely a következőket eredményezni:</para>
+        <itemizedlist>
+            <listitem>
+                <para>Az str string miatt létrehoz a megadott néven egy mappát</para>
+            </listitem>
+            <listitem>
+                <para>Az str2 string miatt belelép ebbe a mappába</para>
+            </listitem>
+            <listitem>
+                <para>Az str3 string miatt pedig kicsmagolja ide az src.zip állományt</para>
+            </listitem>
+        </itemizedlist>
+        <programlisting>const char* command=str.c_str();
+   
+   const char* second_command=str2.c_str();
+
+   const char* third_command=str3.c_str();
+   
+   system(command);
+   system(second_command);
+   system(third_command);</programlisting>
+        <para>Ezután a stringeket átkonvertáljuk char*-á. Erre azért van szükség, ugyanis egy
+            szimpla string nem fogja végrehajtani a fentebb lévő utasításokat, így ezeket a
+            parancsokat át kell adnunk a system függvénynek, viszont stringet nem tudunk paraméterül
+            megadni. Mostmár tehát a system függvények használatával létrehoztunk egy mappát, és
+            kicsomagoltuk ebbe a mappába a src.zip állományt.</para>
+        <programlisting>string path=argv[1];
+	boost::filesystem::path a(argv[1]);
+    int szamlalo=0;
+    read_file(a, szamlalo);
+    cout&lt;&lt; "Az src.zip-ben található java osztályok száma: "&lt;&lt; szamlalo &lt;&lt;endl;
+    return 0;
+
+}</programlisting>
+        <para>Ezután ráengedjük a mappára a read_file függvényünket, amely megszámolja a .java
+            kiterjesztésű fájlokat.</para>
+        <para>A forráskódban különös szerepe van az alábbi
+            header-nek:<programlisting>#include "../boost_1_71_0/boost/filesystem.hpp"</programlisting></para>
+        <para>Ezen nyilván gépenként változtatni kell, mivel nem mindenkinek ugyanott található a
+            boost mappa, és azon belül is a filesystem.hpp állomány, így meg kell adnunk a gépünkön
+            a boos mappa elérési tartományát. Amennyiben nincs letöltve a boost, a következő linken
+            tudjuk beszerezni: <link xlink:href="https://www.boost.org/users/download/"/></para>
+        <para>A programot a következőképpen tudjuk
+            fordítani:<programlisting>g++ jdk_classes.cpp -o jdk_classes -lboost_system -lboost_filesystem -lboost_program_options -std=c++14</programlisting></para>
+        <para>A futtatás pedig így néz
+            ki:<programlisting>./jdk_classes mappanev</programlisting></para>
+        <para>A program futásáról itt egy kép:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/jdk_running.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>A következő képen pedig az látható, hogy létrehozta a parancssori argumentumként
+            megadott néven a mappát, és kicsomagolta az src.zip állományt az adott mappába.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/jdk_kesz.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+    </section>
+    <section>
+        <title>Másoló-mozgató szemantika és Összefoglaló egybevonva</title>
+        <para>Megoldás forrása:</para>
+   
+   <para>A másoló szemantikára akkor van szükségünk, mikor egy meglévő objektumból szeretnénk mégegy
+            példányt megvalósítani. A másoló szemantikához másoló konstruktort kell írnunk. A
+            másolásra két módszer van. Van az ún. shallow copy, vagy magyarul sekély másolás, amely
+            annyit tesz, hogy lényegében nem történik másolás, a másolt objektum megkapja a
+            másolandó objektum memóriacímét. Tehát az új objektumunk egy referencia lesz az eredeti
+            objektumra, amely problémákhoz vezethet, mivel amennyiben az eredeti objektumot változtatjuk, mivel a másolt objektum az eredeti memóriacímére mutat, ezért az is változni fog. Példa erre a Prog1-es védésem, mikor másoló konstruktort kellett írni a
+            binfához, az én megoldásom viszont sekély másolást végzett, tehát a másolás sikeresen
+            megtörtént, viszont amennyiben az eredeti objektumot kitöröltük, a program futtatásakor
+            hibába ütköztünk. Ez annak köszönhető, hogy a másolt objektum az eredeti memóriacímére
+            mutatott, viszont annak megszűnése után a másolt objektum nem tudott tovább élni, mivel
+            megszűnt a cím amire mutatott. Létezik viszont egy másik megoldás, a mély másolás. Ebben
+            az esetben konkrét másolás történik. Ilyenkor a háttérben új memóriaterület foglalás
+            zajlik, így értelemszerűen a shallow copy-val szemben ez a megoldás több időt vesz
+            igénybe. Ez a megoldás akkor szükséges, ha az eredeti objektumon még változtatni
+            szeretnénk, mivel itt ténylegesen új objektum jön létre, ezért ha a másolt objektumon
+            módosítást végzünk, az eredeti nem változik és ez fordítva is igaz. Összetett objektumok esetében rekurzív
+            másolást kell végeznünk, ami azt jelenti, hogy az összes adattag tulajdonságait
+            másolnunk kell. A mozgató szemantika végkimenetelében megegyezik a másoló szemantikával,
+            ugyanis itt is az új objektum meg fog egyezni a régi objektummal. Itt mozgató
+            konstruktor megírására van szükségünk. A mozgató szemantika lényege, hogy az eredeti
+            objektumot „belemozgatjuk” az új objektumba, ezáltal az eredeti objektum kinullázódik,
+            és az új objektumba kerülnek az adatai, tulajdonságai, ekkor a régi objektum már nem
+            veszi el feleslegesen a területet a memóriában, így ha tudjuk, hogy az eredeti objektum
+            adatait nem kell megőrizni, ez a megoldás a legpraktikusabb, mivel több szabad terület
+            marad a memóriában. A mozgatáshoz alkalmaznunk kell az objektum adataira az std::move
+            függvényt, ami a mozgatásért felelős. Fontos dolog, hogy lvalue és rvalue értékátadásról
+            is beszélhetünk, a kettő között pedig lényeges különbség van. Az „lvalue” értékek olyan
+            objektumot jelölnek, melynek a memóriában lefoglalt helye van. Erre példa az int típusú
+            változók: int helo=0. Azonban ha ezzel valamiféle műveletet végzünk, például hozzáadunk
+            ötöt, rvalue értéket kapunk, mivel a „helo+5”-nek nincs előre lefoglalt terület a
+            memóriában. Mozgatáskor „rvalue” referenciát használunk, mely a C++11 újítása, és
+            "&amp;&amp;" operátorral használjuk, az „lvalue” referenciára egyébként a "&amp;"
+            operátort használjuk.</para>
+        <para>Feladatunk az volt, hogy mutassuk be a C++11 másoló és mozgató szemantikáját.</para>
+        <para>Kezdjük is a másolóval.</para>
+        <para>Ehhez a feladathoz a bevprog óta jól ismert védési programot, a z3a7.cpp-t fogjuk
+            használni.</para>
+        <para>Mint az korábban már védési feladat is volt, ehhez készítünk másoló konstruktort. Az
+            alábbi sorral kell kiegészítenünk az alap
+            konstruktort:<programlisting>LZWBinFa(const LZWBinFa &amp; regi) {
+			std::cout &lt;&lt; "Másoló konstruktor" &lt;&lt; std::endl;
+			gyoker = masol(regi.gyoker);
+		}</programlisting></para>
+        <para>Ez a rész az LZWBinFa típusok implementálásakor meg fog hívódni, mivel ez a függvény is a konstruktor része. Ez annyit tesz, hogyha új LZWBinFa-t hozunk létre, és paraméterül kap egy másik binfát, akkor az új fa gyökerére hívja meg a masol függvényt, és a régi gyökeret adja neki paraméterül.<programlisting>Csomopont *masol(Csomopont * elem) {
+			Csomopont* ujelem = NULL;
+			if (elem != NULL) {
+			
+            ujelem=new Csomopont (elem->getBetu());
+            ujelem->ujEgyesGyermek(masol(elem->egyesGyermek()));
+	ujelem->ujNullasGyermek(masol(elem->nullasGyermek()));
+            }
+			return ujelem;
+		}</programlisting></para>
+        <para>A masol függvény a másoló konstruktor meghívásakor fog meghívódni. Ez a függvény
+            deklarál egy új csomópontot, amelynek NULL kezdőértéket ad. Ezután, amennyiben a régi
+            Csomopontunk nem NULL értékkel bír, rekurzívan átmásoljuk a régi Csomopont egyes és
+            nullas gyermekeit, majd ez az ujelem lesz visszaadva.</para>
+        <para>Az LZWBinFa konstruktorát ki kell egészítenünk még az "=" operátor
+            túlterhelésével, ami az alábbi módon
+            történik:<programlisting>LZWBinFa &amp; operator=(LZWBinFa &amp; regi) {     //egyenlőség jel túlterhelés
+			this->gyoker = regi.gyoker;
+			this->fa = regi.fa;
+			return *this;
+		}</programlisting></para>
+        <para>Ez annyit fog tenni, hogy az "=" operátor használatakor további funkciók kerüljenek
+            végrehajtásra. Jelen esetben az fog történni, hogy az egyenlőségjel bal oldalán
+            található -jelen esetben- LZWBinFa gyökerét, és magát a fát egyenlővé teszi az
+            egyenlőségjel jobb oldalán található eredeti LZWBinFa gyökerével és
+            fájával.</para>
+        <programlisting>LZWBinFa *binFa2= new LZWBinFa(*binFa);</programlisting>
+        <para>Itt hívódik meg a másoló konstruktor.</para>
+        <para>Láthatjuk, hogy sikerült a másolás:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/binfa_cpy.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Térjünk át a mozgató
+            konstruktorra.<programlisting>LZWBinFa (LZWBinFa &amp;&amp; regi) {
+		std::cout &lt;&lt; "LZWBinFa move ctor" &lt;&lt; std::endl;
+		gyoker = nullptr; 
+		*this = std::move(regi);
+	}</programlisting></para>
+        <para>A mozgató konstruktorunk fentebb látható. Itt az eredeti gyökért nullává tesszük, és
+            az std::move bal oldalán lévő elemet egyenlővé tesszük a régi
+            objektummal.<programlisting>LZWBinFa&amp; operator=(LZWBinFa &amp;&amp; regi){
+		std::cout &lt;&lt; "LZWBinFa move assign" &lt;&lt; std::endl;
+		std::swap(gyoker, regi.gyoker);
+             std::swap(fa, regi.fa);
+		return *this;
+	}</programlisting></para>
+        <para>Az egyenlőségjel operátort ebben az esetben is túlterheljük. Itt viszont másképp
+            járunk el. Az új objektumunk gyökerét kicseréljük a régi objektumunk gyökerével, majd
+            visszaadjuk ezt az értéket.</para>
+        <para>Tehát amint létrehozzuk a binFa3 objektumunkat, a fentebb látható két függvény egyből
+            meghívódik, mint azt a nyomonkövetés miatt láthatjuk
+            is.<programlisting>LZWBinFa binFa3=std::move(binFa);</programlisting></para>
+        <para>A fentebb látható módon hozzuk létre a mozgatott fánkat. Ez a sor lesz az, ami a
+            fentebb kiemelt két függvényt megindítja. Az eső függvényünk tehát kinullázza és
+            "belemozgatja" a régi fát az újannon létrehozott binFa3-ba, a mozgató értékadás pedig
+            felcseréli a két fa adatait, ezzel az eredeti fa lesz kinullázva, amint azt láthatjuk is
+            lentebb.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/binfa_move.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+    </section>
+   
+</chapter>

@@ -1,0 +1,356 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Gutenberg!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+        <cover>
+            <para>
+                Programozás tankönyvek rövid olvasónaplói.
+            </para>
+        </cover>
+    </info>
+    <section>
+        <title>Programozási alapfogalmak</title>
+        <para>         
+            <citation>PICI</citation>       
+        </para>
+        <para>Juhász István: Magas Szintű Programozási Nyelvek 1</para>
+        <para>A programozási nyelveknek 3 fajtája van:</para>
+        <para> • gépi nyelv</para>
+        <para> • assembly szintű nyelv</para>
+        <para> • magas szintű nyelv</para>
+        <para>A magas szintű nyelven megírt programokat forrásprogramnak nevezzük. Ezeket a
+            forráskódokat szabályok határozzák meg. Szabályok alatt a szintaktikai, azaz a nyelvtani
+            szabályok összessége, valamint a szemantikai, vagyis a tartalmi és értelmezési
+            szabályok, együttese adja.</para>
+        <para>A processzorok csak a saját gépi nyelvükön megírt programokat képesek végrehajtani.
+            Ehhez viszont a meglévő forrásszövegből futtatható állományt, programot kell
+            készítenünk. Ezt kétféleképpen tehetjük meg.</para>
+        <para>Fordítóprogramos módszer:</para>
+        <para>Szükségünk lesz egy speciális programra, amely a magas nyelven megírt forrásszövegből
+            képes gépi kódú tárgyprogramot előállítani. A fordítóprogram a forrásszöveget egy
+            egységkét kezeli, és 4 lépést hajt végre: lexikális elemzés szintaktikai elemzés
+            szemantikai elemzés kódgenerálás</para>
+        <para>A lexikális elemzés felosztja a forrásszöveget lexikális egységekre, a szintaktikai
+            elemzés során megnézi, hogy a forrásszöveg eleget tesz-e az adott nyelv szintaktikai
+            szabályainak. Amennyiben szintaktikailag nem helyes a forrásszöveg, nem képes a gép
+            számára értelmezhető szöveget generálni. Amennyiben helyes, a szövegből tárgyprogramot
+            készít, ami gépi nyelvű, de még nem futtatható, így ebből egy szerkesztő segítségével
+            állíthatunk elő futtatható állományt. Ezt a betöltő elhelyezi a tárban, és a futtató
+            rendszer lesz felelős a futó program működéséért.</para>
+        <para>A fordítóprogramok valamilyen tetszőleges nyelvről egy tetszőleges nyelvre fordítanak.
+            Létezik olyan magas szintű nyelv, amely nem nyelvi elemeket is tartalmaz, ekkor
+            előfordító segítségével egy adott nyelvű forrásprogramot kell generálni, amit a nyelv
+            fordítója képes feldolgozni. Ilyen nyelvre egy példa a C nyelv.</para>
+        <para>Interpreteres módszer: </para>
+        <para>Az első három lépés itt is megtalálható, viszont ezen módszert alkalmazva nem készül
+            tárgyprogram. A forrásprogramot sorról (utasításról) sorra értelmezi és végrehajtja .Az
+            eredményt valamilyen gépi rutin lefutása után kapjuk.</para>
+        <para>A programnyelvek lehetnek fordítóprogramos, vagy interpreteresek, vagy pedig mindkét
+            módszert alkalmazzák.</para>
+        <para>A hivatkozási nyelvek alatt a program saját szabványát értjük. A hivatkozási nyelvben
+            pontosan definiálva vannak a szintaktikai és szemantikai szabályok. A hivatkozási nyelv
+            mellett léteznek implementációk, ezek vagy fordítóprogramok vagy interpreterek. Az
+            implementációkból sok van, viszont ezek egymással illetve a hivatkozási nyelvvel nem
+            kompatibilisek , így a hordozhatóság problémája még 50 év után is fennáll. Manapság a
+            programok írásához integrált fejlesztői környezeteket (IDE) is használhatunk, melyek
+            megkönnyítik a munkánkat.</para>
+        <para>A programnyelveket 3 féle csoportra bonthatjuk:</para>
+        <para>Imperatív nyelvek:</para>
+        <para>-Algoritmikus nyelvek: algoritmust kódolunk</para>
+        <para>-utasítások sorozata adja a programot</para>
+        <para>-Legfőbb programozói eszköz a változó</para>
+        <para>-Szorosan kötődnek a Neumann-architektúrához</para>
+        <para>-Alcsoportjai: Eljárásorientált nyelvek, Objektumorientált nyelvek</para>
+        <para>Deklaratív nyelvek:</para>
+        <para>-Nem algoritmikus nyelvek</para>
+        <para>-Nem kötődnek szorosan a Neumann-architektúrához</para>
+        <para>-A programozó csak a problémát adja meg</para>
+        <para>-Nincs lehetőség memóriaműveletekre</para>
+        <para>-Alcsoportjai: funkcionális nyelvek, logikai nyelvek</para>
+        <para>Máselvű nyelvek</para>
+        <para>Adattípusok</para>
+        <para>Az adattípusok ún. absztrakt programozási eszközök, melyek más programozási eszköz
+            komponenseiként jelennek meg. Névvel, azaz azonosítóval rendelkeznek.</para>
+        <para>Egy adattípust 3 dolog is meghatároz:</para>
+        <para>-tartomány</para>
+        <para>-műveletek</para>
+        <para>-reprezentáció</para>
+        <para>Minden nyelv rendelkezik beépített típusokkal, viszont saját típus definiálására is
+            van lehetőség, ehhez meg kell adnunk a tartományát és műveleteit. Azonban nem minden
+            nyelvben lehet saját műveleteket és operátorokat megadni ezekhez a típusokhoz.</para>
+        <para>Az adattípusokat két csoportra tudjuk bontani.</para>
+        <para>Egyszerű (skalár) adattípus</para>
+        <para>Atomi értékeket tartalmaz, minden értéke egyedi.</para>
+        <para>Ide tartoznak például az egészek ábrázolására használt típusok, melyek fixpontos
+            ábrázolásúak, vagy a valós típusok, melyek lebegőpontos ábrázolásúak.</para>
+        <para>Ezeket numerikus típusoknak hívjuk, és ezeken numerikus valamint hasonlító műveleteket
+            hajthatunk végre.</para>
+        <para>A karakteres típus tartományába az elemi karakterek, a sztring típus elemei pedig a
+            karaktersorozatok. Ezeket karakteresen ábrázoljuk, szöveges és hasonlító műveleteket
+            lehet velük végezni.</para>
+        <para>Néhány nyelvben megjelenik a logikai típus, mely tartománya igaz és hamis értékekből
+            áll, logikai és hasonlító műveletek elvégzésére alkalmas.</para>
+        <para>Létezik ún. felsorolásos típus, de ezt magunknak kell létrehozni, néhány nyelv pedig
+            értelmezi a sorszámozott típust is.</para>
+        <para>Összetett típusok</para>
+        <para>Két legfontosabb típusa a tömb és a rekord. Utóbbit csak a FORTRAN nyelv nem
+            ismeri.</para>
+        <para>A tömb statikus és homogén összetett típus, ami azt jelenti, hogy olyan
+            értékcsoportokat foglal magba, amelyben az elemek száma és típusa azonos. Egy tömböt
+            dimenzióinak száma, indexkészletének tartomány és típusa, valamint elemeinek típusa
+            határoz meg.</para>
+        <para>Egyes nyelvek a többdimenziós tömböket nem ismerik. A többdimenziós tömbök lehetnek
+            sor- vagy oszlopfolytonosak.</para>
+        <para>A tömb nevével az összes elemére együtt tudunk hivatkozni. Csak bizonyos elemekre
+            indexek megadásával tudunk hivatkozni.</para>
+        <para>A rekord típus minden esetben heterogén, olyan értékcsoportokat foglal magába, melyek
+            elemei lehetnek különböző típusúak is. Az értékcsoporton belül mezők találhatóak.
+            Ezeknek neve és saját típusa van, hivatkozni rájuk a következőképp tudunk:
+            eszköznév.mezőnév</para>
+        <para>Mutató típus</para>
+        <para>Elemei tárcímek, az indirekt címzés valósítható meg velük, értékük tárbeli
+            címek.</para>
+        <para>A nevesített konstans</para>
+        <para>3 komponense van: név, típus, érték.</para>
+        <para>Gyakorlatban a nevével jelenik meg, és mindig az értékét jelenti, értéke nem
+            változtatható meg a futás során. Sokszor előforduló értékeknél szoktuk használni.</para>
+        <para>#define név literál alakban lehet bevezetni.</para>
+        <para>A változó</para>
+        <para>4 komponense van: név, attribútumok, cím és érték. A név azonosítót, az attribútumok
+            viselkedési jellemzőket határoznak meg. Utóbbi komponenst deklarációval állítjuk be,
+            mely történhet explicit, implicit és automatikus módon.</para>
+        <para>Címeket is több módon oszthatunk ki.</para>
+        <para>Statikusan: futás előtt eldől a változó címe</para>
+        <para>Dinamikusan: futtató rendszer végzi a hozzárendelést</para>
+        <para>Programozó által vezérelt módon: mi rendeljük a változóhoz a címkomponenst.</para>
+        <para>Mindhárom esetben kell lennie egy olyan eszköznek, mellyel a programozó megszüntetheti
+            a címkomponenst.</para>
+        <para>Több címhozzárendelést ismernek általában a nyelvek, ezek a statikus, dinamikus, és a
+            programozó által vezérelt címkiosztások.</para>
+        <para>A változók megadása két féleképpen történhet. Kérhetünk be a felhasználótól (input
+            módon), valamint adhatunk nekik kezdőértéket.</para>
+        <para>Kifejezések</para>
+        <para>Arra valók, hogy a programban ismert értékekből új értéket határozzunk meg. 2
+            komponense van: érték és típus.</para>
+        <para>Operandusokból, -lehet literál, nevesített konstans, változó vagy függvényhívás-
+            operátorokból (műveleti jelek) és kerek zárójelekből -műveletek végrehajtási sorrendjét
+            befolyásolják- áll.</para>
+        <para>A kifejezéseket a használt operandusok száma alapján csoportosíthatjuk.</para>
+        <para>Alakjai: prefix (* 3 5), infix (3 * 5), postfix (3 5 *) lehet. Az eljárásorientált
+            nyelvek az infix alakot használják.</para>
+        <para>A műveletek feldolgozási sorrendje is alakfüggő. Néhány nyelvben megjelennek ún.
+            rövidzár operátorok, melyeknél nem szükséges az egész kifejezést kiértékelnünk, hogy
+            megkapjuk az eredményt. (pl. és operátor).Továbbá nyelvenként változik még, hogy egy
+            kifejezésnél csak azonos típusú vagy különböző típusú operandusokkal végzünk
+            műveleteket. Utóbbi eset típuskonverzió segítségével jöhet létre.</para>
+        <para>Utasítások</para>
+        <para>A programozási nyelvek egyik legfontosabb elemei. Olyan egységek, melyek algoritmusok
+            lépéseit adják meg. Két csoportra bontjuk: deklarációs és végrehajtható
+            utasítások.</para>
+        <para>A deklarációs utasítások mögött nem áll tárgykód, ezek a fordítóprogramnak szólnak. A
+            végrehajtható utasításokból generálódik a tárgykód.</para>
+        <para>Végrehajtható utasítások csoportjai: értékadó-, üres-, ugró-, elágaztató-,
+            ciklusszervező-, hívó-, vezérlésátadó-, input/output- és egyéb utasítások.</para>
+        <para>Értékadó utasítás: beállítja, módosítja a változók értékkomponensét.</para>
+        <para>Ürest utasítás: hatására a processzor egy üres gépi utasítást hajt végre.</para>
+        <para>Ugró utasítás: a program egy adott pontjáról egy másik végrehajtó utasításra adhatjuk
+            át a vezérlést.(GOTO)</para>
+        <para>Elágaztató utasítások</para>
+        <para>Kétirányú (feltételes): a program egy adott pontján 2 tevékenység közül választhatunk.
+            (IF feltétel THEN tevékenység [ELSE tevékenység])</para>
+        <para>Többirányú: a program egy adott pontján egymást kizáró tevékenységek közül egyet hajt
+            végre.</para>
+        <para>Ciklusszervező utasítások</para>
+        <para>Azt teszik lehetővé, hogy egy utasítást akárhányszor megismételhessünk.</para>
+        <para>3 részből áll: fej, mag, vég</para>
+        <para>Feltételes ciklus: az ismétlődést a feltételigaz vagy hamis értéke határozza meg.
+            Létezik kezdőfeltételes (while), végfeltételes (do while).</para>
+        <para>Előírt lépésszámú ciklus: az ismétlődésre vonatkozó információk a ciklusfejben
+            vannak.</para>
+        <para>Felsorolásos ciklus: az előző típus általánosítása.</para>
+        <para>Végtelen ciklus: nincs ismétlődésre vonatkozó információ sem a fejben, sem a
+            végben.</para>
+        <para>Összetett ciklus: az előző 4 kombinációja. Bonyolult ciklusokat valósíthatunk meg
+            velük.</para>
+        <para>Vezérlő utasítások</para>
+        <para>A C-ben 3 féle létezik: continue, break, return.</para>
+        <para>CONTINUE;</para>
+        <para>ciklus magjában alkalmazható, a ciklus magjában a többi utasítást nem hajtja
+            végre.</para>
+        <para>BREAK;</para>
+        <para>A ciklust szabályosan befejezteti.</para>
+        <para>RETURN [kifejezés];</para>
+        <para>Szabályosan befejezteti a függvényt, majd a vezérlés átkerül a hívóhoz.</para>
+        <para>A program szövege programegységekre bontható.</para>
+        <para>Alprogramok</para>
+        <para>Az alprogram a meghatározója a programnak. Bemeneti adatcsoportot képez le kimeneti
+            adatcsoportra. Az alprogram az újrafelhasználás eszköze. Akkor alkalmazhatjuk, ha a
+            programrész megismétlődik. Ekkor ezt a részt kiemelhetjük, elég egyszer megírni, és az
+            adott részeken csak hivatkozni kell rá.</para>
+        <para>4 komponensből áll: név, formális paraméterlista, törzs, környezet.</para>
+        <para>A név egy azonosító, a formális paraméter lista pedig a specifikáció része, itt
+            szerepelnek az azonosítók, illetve megadható a paraméter futása közbeni viselkedést
+            szabályozó információk. Lehet üres, ez az ún. paraméter nélküli alprogram. A törzsben a
+            deklarációs és végrehajtó utasítások szerepelnek. Az itt szereplő változók lokális
+            változók. Egy alprogram környezetét a globális változó együttese adja.</para>
+        <para>Az alprogramok két fajtáját különböztetjük meg: eljárás és függvény.</para>
+        <para>Az eljárásban valamilyen tevékenység hajtódik végre, híváskor ezen eredményt
+            használjuk fel.</para>
+        <para>A függvény feladata pedig az, hogy egyetlen értéket határozzon meg, ez lehet
+            tetszőleges típusú.</para>
+        <para>Előfordul, hogy a függvény megváltoztatja a paramétereit, vagy a környezetét, Ezt
+            mellékhatásnak nevezzük.</para>
+        <para>Függvényt meghívni csak kifejezésben lehet, alakja: függvénynév(aktuális paraméter
+            lista)</para>
+        <para>Hívási lánc, rekurzió</para>
+        <para>Egy programegység meghívhat egy másik programegységet, amely egy másikat, és így
+            tovább. Ez a hívási lánc, melynek első tagja mindig a főprogram. Futás közben
+            dinamikusan épül fel és bomlik le.</para>
+        <para>Ha aktív alprogramot hívunk meg, rekurzióról beszélünk. Ez kétféle lehet.</para>
+        <para>Közvetlen: egy alprogram önmagát hívja meg</para>
+        <para>Közvetett: korábban szereplő alprogramot hívunk meg.</para>
+        <para>Néhány nyelvben alprogramot meghívni lehet a törzsben is, ún. másodlagos belépési
+            pontokat kialakítva. Így vagy a fejben megadott névvel, vagy a másodlagos belépési pont
+            nevével lehet hivatkozni. Amennyiben a fejen keresztül lépünk be, az egész törzs
+            végrehajtódik, másodlagos belépési ponton történő belépés során a törzs egy része
+            hajtódik csak végre.</para>
+        <para>Paraméterkiértékelés</para>
+        <para>Az a folyamat, mikor egy alprogram hívásánál a formális- és aktuális paraméterek
+            egymáshoz rendelődnek. Mindig a formális paraméter lista az elsődleges, melyet az
+            alprogram specifikációja tartalmaz, és egy van belőle, tehát ez a meghatározó.</para>
+        <para>Paraméterátadás</para>
+        <para>Kommunikáció, mely az alprogram és más programegységek között zajlik. Mindig van egy
+            hívó és egy hívott programegység.</para>
+        <para>Fajtái: érték szerinti, cím szerinti, eredmény szerinti, érték-eredmény szerinti, név
+            szerinti, szöveg szerinti.</para>
+        <para>Érték szerinti: a címkomponensek értéke átkerül a hívott program területén lefoglalt
+            címkomponensre.</para>
+        <para>Cím szerinti: meghatározódik az aktuális paraméter címe, ez átadódik a hívott
+            alprogramnak.</para>
+        <para>Érték-eredmény szerinti: meghatározódik az aktuális paraméter értéke és címe, majd
+            ezek átkerülnek a hívotthoz.</para>
+        <para>Név szerinti: a formális paraméter nevének minden előfordulását átírj a
+            program.</para>
+        <para>Szöveg szerinti: a név szerinti paraméterátadás egyik fajtája, akkor írja felül a
+            paramétert, ha a neve először fordul elő.</para>
+        <para>Blokk</para>
+        <para>Olyan programegység, mely másik programegység belsejében helyezkedik el. Van kezdet,
+            törzse, vége, bárhol elhelyezhető, ahol végrehajtó utasítás állhat.</para>
+        <para>INPUT/OUTPUT</para>
+        <para>Ezen a területen a programnyelvek nagyban eltérnek egymástól. Egyes nyelvekben nem is
+            lehet megvalósítani, az implementációra bízzák a megoldást.</para>
+        <para>A perifériákkal történi kommunikációért felelős. Középpontban egy állomány áll.</para>
+        <para>Egy állomány funkció szerint lehet:</para>
+        <para>input állomány: csak olvasni lehet belőle</para>
+        <para>output állomány: csak írni lehet bele</para>
+        <para>input-output állomány: olvasni és írni is lehet.</para>
+        <para>Ha állományokkal akarunk dolgozni, végre kell hajtanunk pár lépést:</para>
+        <para>Deklaráció: a logikai állományt deklarálni kell, el kell látni megfelelő névvel és
+            attribútumokkal.</para>
+        <para>Összerendelés: a logikai állománynak megfeleltetünk egy fizikai állományt.</para>
+        <para>Állomány megnyitása: csak akkor tudunk vele dolgozni, ha megnyitjuk. Ekkor operációs
+            rendszer rutinok futnak le. Ekkor a program futása folyamán az állományt más-más
+            funkcióra is megnyithatjuk.</para>
+        <para>Feldolgozás: ha megnyitottuk, írhatunk bele és olvashatunk belőle.</para>
+        <para>Lezárás: ismét op.rendszer rutinok futnak le. Ilyenkor történik meg a könyvtárak
+            aktualizálása. O, I/O állományokat le kell zárni, Input állományokat pedig illik
+            lezárni.</para>
+    </section>        
+    <section>
+        <title>Programozás</title>
+        <para>
+            <citation>BMECPP</citation></para>
+        <para>A C++ a C nyelv továbbfejlesztése, a C nyelv „veszélyes” elemeit cseréli le,
+            összességében letisztultabb, átláthatóbb kódot kapunk. Szintaktikája eltér a C nyelvtől,
+            külön fordítóval fordítjuk.</para>
+        <para>C nyelvben például ha egy függvényt paraméter nélkül deklarálunk, akkor az a függvény
+            tetszőleges számú paraméterrel hívható, míg C++-ban ez egy void paraméterrel rendelkező
+            függvény lesz. Ez annyit jelent, hogy a függvény nem rendelkezik paraméterrel.
+            Amennyiben nem adunk meg visszatérési típust, a C nyelvben int típusú változót ad
+            vissza, míg C++-ban hibát fog jelezni a fordtó.</para>
+        <para>A C++ nyelvben kétféle main függvény létezik. Az egyik verzióban előjön az argc, argv.
+            Az előbbi a parancssori argumentumok számát, utóbbi a paraméterül kapott parancssori
+            argumentumokat tárolja.</para>
+        <para>C++ nyelvben megjelenik a bool típus, ami egy igaz/hamis értékkel rendelkező
+            változó.</para>
+        <para>A C nyelvvel ellentétben itt megtalálható beépített több-bájtos stringek, itt nem
+            szükséges semmit sem includálni.</para>
+        <para>A változódeklarációk már mindenhol szerepelhetnek, deklarálhatunk változókat
+            közvetlenül a használatuk előtt.</para>
+        <para>C++-ban lehetőségünk nyílik azonos nevű függvények deklarálására, ha az
+            argumentumlistájuk alapján elkülöníthetőek. A fordító névferdítés technikájával
+            különbözteti meg ezeket a függvényeket.</para>
+        <para>A függvények paramétereinek alapértelmezett értékeket is adhatunk, ez akkor jó, ha nem
+            kapnak értéket. A C++-ban referencia szerint is adhatunk át paramétereket, mivel a
+            referencia típus is megjelenik ebben a nyelvben. Referenciát úgy deklarálhatunk, az
+            azonosítója elé egy &amp; jelet illesztünk. Amennyiben a referencia értékét
+            változtatjuk, úgy változik az eredeti változó értéke is.</para>
+        <para>Egységbe zárás</para>
+        <para>Az objektumorientált programozás egyik alapelve, jelentése egyszerű, bármiből lehet
+            adatstruktúrát készíteni, és megadni a tulajdonságait. Ezeket másnéven osztályoknak
+            hívjuk. Ezek rendelkeznek példányokkal, ezeket nevezzük objektumoknak, az objektumokon
+            belül megjelenik az adatrejtés fogalma is, ami annyit jelent, hogy bizonyos elemek nem
+            férhetnek hozzá adott elemekhez. Képbe jön az öröklődés fogalma is, mely során speciális
+            osztályok kerülnek létrehozásra, amelyek rendelkeznek az alap osztály tulajdonságaival.
+            Ezzel új objektumot hozunk létre. Ha példányosítunk egy adott osztályt, memóriafoglalás
+            történik. Az osztályon belüli változók, illetve függvények a tagváltozók és
+            tagfüggvények, utóbbit a struktúrán belül és kívül is deklarálhatjuk, viszont a
+            tagfüggvények csak egy előfordulásánál történik memóriafoglalás. A private: kulcsszó
+            után történik az adatrejtés, ekkor az itt deklarált változók és függvények csak ebben a
+            részben lesznek láthatóak, a program többi részével nem állnak kapcsolatban, így nem
+            lesznek használhatók a private-n kívül. Egy osztály példányosításakor inicializálhatjuk
+            az objektumot, ezt konstruktor segítségével tehetjük. Ez egy függvény, amely az objektum
+            példányosításakor minden esetben meghívódik magától. A fordítóprogram is képes ellátni
+            konstruktorral a programot, amennyiben mi nem írunk külön, viszont nem fog történni
+            benne semmi. Saját kezűleg több konstruktort is megírhatunk. A konstruktornak létezik
+            párja, ezt destruktornak hívjuk. A destruktort is képes a fordítóprogram megírni
+            alapértelmezetten, viszont ebben sem történik ilyenkor semmi. Ez a függvény az objektum
+            megszűnése után hívódik meg, memóriát szabadít fel.</para>
+        <para>C++-ban megjelenik a new és a delete függvény. Előbbi memória foglalásra, utóbbi
+            memória felszabadításra képes. A new függvényben a konstruktor paramétereit meg kell
+            adnunk. </para>
+        <para>A konstruktornak létezik egy tipikus példája, a másoló konstruktor. Ez egy már meglévő
+            objektumot másol bele egy új objektumba. Egy apró módosítással elérhető, hogy a private:
+            részben szereplő változókat és függvényeket elérjük a private: részen kívül. Ezt úgy
+            tehetjük meg, hogy a függvény/változó elé beszúrjuk a friend szót, viszont csak
+            korlátozottan férhetünk a védett elemekhez hozzá, és ritkán használjuk. Az osztályokon
+            beszélünk statikus változókról, ezek az adott osztályhoz tartoznak, és akkor is
+            használhatók, ha még az osztályból még egy példány sem került példányosításra. Léteznek
+            statikus tagfüggvények is, melyeket objektum nélkül is lehet használni, viszont csak a
+            statikus részeket éri el. Az osztályokon belül adhatunk meg típusdefiníciókat.</para>
+        <para>A C++ nyelvben a matematikai műveleteket operátorok használatával végezhetünk. Ezek az
+            operátorok be vannak építve, viszont túlterheléssel funkciójukat megváltoztathatjuk.
+            Megjelent néhány új operátor is, pl a pointer-tag operátor. Az operátorokra mint
+            függvényekre kell tekintenünk.</para>
+        <para>C++-ban bekérésre és kiíratásra adatfolyamok állnak rendelkezésünkre, melyeket a
+            &lt;&lt; és a >> operátorokkal tudunk használni. Kiíratásra a cout adatfolyamot
+            használjuk, majd utána &lt;&lt; operátort használunk. A bekérésre a cin jelent
+            megoldást, a >> operátor használatával. A beolvasási limitet meg lehet változtatni az
+            ignore függvénnyel. Az adatfolyamok rendszerhívásokat használnak, ezért buffereket
+            hoznak létre ezekhez a rendszerhívásokhoz. Ezeket a buffereket a flush függvénnyel lehet
+            kiüríteni, de akár hibaüzenetet is küldhetünk, ekkor a beolvasáskor nem történik semmi.
+            A stringek olvasásánál kicsit más a helyzet. Amennyiben szóközzel elválasztott
+            karakterláncokat tartalmaz, a getline függvénnyel tudjuk ezeket beolvasni. Az
+            adatfolyamok tagfüggvényekkel rendelkeznek. Ezeket speciális objektumokkal, ún.
+            manipulátorokkal tudjuk megváltoztatni, egy egyszerű példa ezekre a speciális
+            objektumokra az endl, mely megtöri az adott sort. Az állományból olvasás, állományba
+            írás is adatfolyamokon keresztül működik, ilyenkor az ifstream és offstream adatfolyamot
+            használjuk, melyeket meg kell nyitni és be is kell zárni, ez történhet
+            konstruktor-destruktor párossal is, viszont létezik ezek megvalósítására open és close
+            függvény.</para>
+        <para>A hibakezelés kivételkezeléssel történik. Amint egy kivételt érzékel a program, a
+            vezérlés a kivételkezelőre ugrik. Ennek megvalósítása a try-catch blokkal történik. A
+            try blokkban található utasítások mind végrehajtódnak, ha nem talált hibát. Amennyiben
+            viszont találunk hibát, azt eldobjuk a throw függvénnyel, és az elkapást a catch
+            függvényre bízzuk. Ezeket a blokkokat egymásba is ágyazhatjuk, ezzel megvalósítva a
+            különböző szinteken történő hibakezelést. A throw rendelkezhet üres paraméterlistával
+            is, ekkor a kivétel újra dobható lesz. A 190. oldalon található egy program, ez a
+            program egy szám reciprokát adja vissza. Ebben a programban alkalmazzuk a try catch
+            blokkot. A könyvben a 197. oldalon található még egy példa, melyben az ún. verem
+            visszacsévélése folyamat található meg. Ez gyakorlatban annyit jelent, hogy eldobjuk a
+            kivételt, utána az elkapásig egy hívási láncban haladunk felfelé, és a lokális
+            függvények változóit felszabadítjuk.</para>
+    </section>        
+</chapter>                

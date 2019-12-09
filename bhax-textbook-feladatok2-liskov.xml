@@ -1,0 +1,716 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Liskov!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>Liskov helyettesítés sértése</title>
+        <para>Megoldás forrása:</para>
+        <para>Feladatunk arról szólt, hogy írjunk olyan programot, mely a Liskov helyettesítési
+            elvet (Liskov Substitution Principle) sérti meg. A Liskov helyettesítési elv az
+            objektumorientált programozási nyelvekben jelenik meg. Az elv a következő: legyen T egy
+            osztály, S pedig legyen T-nek egy alosztálya. Azokon a helyeken, ahol T-t használunk,
+            használhatunk S-t is anélkül, hogy a programrészben bármi változás történne, tehát a T
+            típusú objektumok helyén használhatunk S típusú objektumokat is.</para>
+        <para>Lássuk a programot
+            C++-ban:<programlisting>class Madar {
+public:
+     virtual void repul() {};
+};</programlisting></para>
+        <para>Létrehozunk egy Madar nevű osztályt, ami egy repul függvénnyel fog rendelkezni, mely a
+            madarakat fogja reptetni.</para>
+        <programlisting>class Program {
+public:
+     void fgv ( Madar &amp;madar ) {
+          madar.repul();
+     }
+};</programlisting>
+        <para>A Program nevű osztályunk egy Madar objektumot fog reptetni a repül függvény
+            segítségével.<programlisting>class Sas : public Madar
+{};
+
+class Pingvin : public Madar // ezt úgy is lehet/kell olvasni, hogy a pingvin tud repülni
+{};</programlisting></para>
+        <para>Létrehozunk egy Sas és egy Pingvin nevű alosztályt. Ez a két osztály a Madar osztály
+            alosztályai
+            lesznek.<programlisting>int main ( int argc, char **argv )
+{
+     Program program;
+     Madar madar;
+     program.fgv ( madar );
+
+     Sas sas;
+     program.fgv ( sas );
+
+     Pingvin pingvin;
+     program.fgv ( pingvin ); // sérül az LSP, mert a P::fgv röptetné a Pingvint, ami ugye lehetetlen.
+
+}</programlisting></para>
+        <para>A main függvényben madarakat reptetünk, viszont láthatjuk, hogy Pingvin típusú
+            objektumra is alkalmazzuk a repul függvényt, viszont köztudott, hogy a pingvinek bár
+            madarak, nem tudnak repülni.</para>
+        <para>Programunk Java-ban majdnem megegyezik, csak a szintaktikában kellett néhány
+            változtatást
+            elvégezni.<programlisting>class Madar {
+    public
+
+
+    void repul() {
+    }
+
+
+    
+    static class Program {
+
+
+        void fgv(Madar madar) {
+            madar.repul();
+        }
+    }
+
+    ;
+
+    
+    static class Sas extends Madar
+
+    {
+    }
+
+    ;
+
+    static class Pingvin extends Madar 
+
+    {
+    }
+
+    ;
+
+    public static void main(String[] args) {
+
+
+        Program program=new Program();
+        Madar madar=new Madar();
+        program.fgv(madar);
+
+        Sas sas=new Sas();
+        program.fgv(sas);
+
+        Pingvin pingvin=new Pingvin();
+        program.fgv(pingvin); 
+
+    }
+}</programlisting></para>
+    </section>
+    <section>
+        <title>Szülő-gyerek</title>
+        <para>Megoldás forrása:</para>
+        <para>Feladatunk az volt, hogy szemléltettük, hogy habár egy osztály (nevezzük szülőnek)
+            alosztály (nevezzük gyereknek) örökli, azaz rendelkezik a szülőosztály adataival,
+            viszont fordítva ez nem lesz igaz, tehát a szülőosztály nem fog rendelkezni a
+            gyerekosztály adataival.</para>
+        <para>Megvalósítás C++-ban:</para>
+        <programlisting>#include &lt;iostream>
+
+
+class Szulo{
+public:
+    bool dolgozik;
+    Szulo(){
+        bool dolgozik=true;
+    };
+};</programlisting>
+        <para>Deklaráljuk a szülőosztályt, amely jelen esetben csak egy adattal fog rendelkezni,
+            méghozzá azzal, hogy az adott szülő
+            dolgozik.<programlisting>class Gyerek:public Szulo{
+public:
+    bool beszel;
+    Gyerek(){
+        bool beszel=false;
+    };
+};</programlisting></para>
+        <para>A Szulo osztály alosztályaként deklaráljuk a Gyerek osztályt, ami egy beszel nevű
+            logikai változóval fog rendelkezni, ez jelzi, hogy az adott gyerek még nem tud
+            beszélni.<programlisting>int main( int argc, char **argv ){
+    Szulo* szulo=new Szulo;
+    Gyerek* gyerek=new Gyerek;
+    
+    std::cout&lt;&lt;szulo->beszel;
+}</programlisting></para>
+        <para>A main függvényben ki szeretnénk iratni, hogy az adott szülő beszél e, viszont habár a
+            gyerek osztály igen, a szülő osztály nem rendelkezik beszel paraméterrel, ezáltal a
+            program nem fog lefordulni.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/szulogyerek.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Java
+            megoldás:<programlisting>class Szulo {
+    
+            
+
+    boolean dolgozik=true;
+    
+
+    static class Gyerek extends Szulo{
+        boolean beszel=false;
+    }
+    public static void main(String[] args) {
+        Szulo szulo=new Szulo();
+        Gyerek gyerek=new Gyerek();
+        
+        System.out.println(szulo.beszel);
+        
+    }
+}</programlisting></para>
+        <informalfigure>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/szulogyerek2.png"/>
+                </imageobject>
+            </mediaobject>
+        </informalfigure>
+    </section>
+    <section>
+        <title>Anti OO</title>
+        <para>Megoldás forrása:<link
+                xlink:href="https://www.tankonyvtar.hu/hu/tartalom/tkt/javat-tanitok-javat/apas03.html#id561066"
+            /></para>
+        <para>Feladatunk az volt, hogy a BPP algoritmussal határozzuk meg a Pi hexadecimális
+            értékének 3 számjegyét. Ez a 3 számjegy a 10^6. helyen lévő, a 10^7. helyen lévő, és a
+            10^8. helyen lévő számjegy. Ezt a programot 4 nyelven kellett elészítenünk, majd pedig
+            összevetni a futási időket, amit egy táblázat segít szemléltetni a forráskódok és a
+            futásról készült képek alatt.</para>
+        <para>A program C
+            nyelven:<programlisting>#include &lt;stdio.h>
+#include &lt;math.h>
+#include &lt;time.h>
+/*
+ * pi_bbp_bench.c
+ *
+ * DIGIT 2005, Javat tanítok
+ * Bátfai Norbert, nbatfai@inf.unideb.hu
+ *
+ * A PiBBP.java-ból kivettük az "objektumorientáltságot", így kaptuk
+ * a PiBBPBench osztályt, amit pedig átírtuk C nyelvre.
+ *
+ */
+
+/*
+ * 16^n mod k
+ * [BBP ALGORITMUS] David H. Bailey: The
+ * BBP Algorithm for Pi. alapján.
+ */
+long
+n16modk (int n, int k)
+{
+  long r = 1;
+
+  int t = 1;
+  while (t &lt;= n)
+    t *= 2;
+
+  for (;;)
+    {
+
+      if (n >= t)
+	{
+	  r = (16 * r) % k;
+	  n = n - t;
+	}
+
+      t = t / 2;
+
+      if (t &lt; 1)
+	break;
+
+      r = (r * r) % k;
+
+    }
+
+  return r;
+}
+
+/* {16^d Sj}
+ * [BBP ALGORITMUS] David H. Bailey: The
+ * BBP Algorithm for Pi. alapján.
+ */
+double
+d16Sj (int d, int j)
+{
+
+  double d16Sj = 0.0;
+  int k;
+
+  for (k = 0; k &lt;= d; ++k)
+    d16Sj += (double) n16modk (d - k, 8 * k + j) / (double) (8 * k + j);
+
+  /*
+     for(k=d+1; k&lt;=2*d; ++k)
+     d16Sj += pow(16.0, d-k) / (double)(8*k + j);
+   */
+
+  return d16Sj - floor (d16Sj);
+}
+
+/*
+ * {16^d Pi} = {4*{16^d S1} - 2*{16^d S4} - {16^d S5} - {16^d S6}}
+ * [BBP ALGORITMUS] David H. Bailey: The
+ * BBP Algorithm for Pi. alapján.
+ */
+main ()
+{
+
+  double d16Pi = 0.0;
+
+  double d16S1t = 0.0;
+  double d16S4t = 0.0;
+  double d16S5t = 0.0;
+  double d16S6t = 0.0;
+
+  int jegy;
+  int d;
+
+  clock_t delta = clock ();</programlisting></para>
+        <para>A programban az alábbi helyen szükséges módosítanunk, hogy a különböző hatványokon
+            kapott számjegyeket visszakapjuk.</para>
+        <programlisting>for (d = 1000000; d &lt; 1000001; ++d)</programlisting>
+        <para>Ez a prefix a 10^6. számjegyet adja vissza, amennyiben ezen változtatni szeretnénk, a
+            0-k számát növeljük 1-gyel, így visszakapjuk a 10^7. számjegyet és így tovább. Mind a 4
+            nyelven megírt porgramban ugyanitt és ugyanígy kell végrehajtanunk a módosítást, így ezt
+            külön többször nem emelném ki.</para>
+        <programlisting>{
+
+      d16Pi = 0.0;
+
+      d16S1t = d16Sj (d, 1);
+      d16S4t = d16Sj (d, 4);
+      d16S5t = d16Sj (d, 5);
+      d16S6t = d16Sj (d, 6);
+
+      d16Pi = 4.0 * d16S1t - 2.0 * d16S4t - d16S5t - d16S6t;
+
+      d16Pi = d16Pi - floor (d16Pi);
+
+      jegy = (int) floor (16.0 * d16Pi);
+
+    }
+
+  printf ("%d\n", jegy);
+  delta = clock () - delta;
+  printf ("%f\n", (double) delta / CLOCKS_PER_SEC);
+} </programlisting>
+        <para>Egy kép a futásról:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/PiBPP_c.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Megoldás
+            C++-ban:<programlisting>#include &lt;stdio.h>
+#include &lt;math.h>
+#include &lt;time.h>
+#include &lt;iostream>
+/*
+ * pi_bbp_bench.c
+ *
+ * DIGIT 2005, Javat tanítok
+ * Bátfai Norbert, nbatfai@inf.unideb.hu
+ *
+ * A PiBBP.java-ból kivettük az "objektumorientáltságot", így kaptuk
+ * a PiBBPBench osztályt, amit pedig átírtuk C nyelvre.
+ *
+ */
+
+/*
+ * 16^n mod k
+ * [BBP ALGORITMUS] David H. Bailey: The
+ * BBP Algorithm for Pi. alapján.
+ */
+long
+n16modk (int n, int k)
+{
+  long r = 1;
+
+  int t = 1;
+  while (t &lt;= n)
+    t *= 2;
+
+  for (;;)
+    {
+
+      if (n >= t)
+	{
+	  r = (16 * r) % k;
+	  n = n - t;
+	}
+
+      t = t / 2;
+
+      if (t &lt; 1)
+	break;
+
+      r = (r * r) % k;
+
+    }
+
+  return r;
+}
+
+/* {16^d Sj}
+ * [BBP ALGORITMUS] David H. Bailey: The
+ * BBP Algorithm for Pi. alapján.
+ */
+double
+d16Sj (int d, int j)
+{
+
+  double d16Sj = 0.0;
+  int k;
+
+  for (k = 0; k &lt;= d; ++k)
+    d16Sj += (double) n16modk (d - k, 8 * k + j) / (double) (8 * k + j);
+
+  /*
+     for(k=d+1; k&lt;=2*d; ++k)
+     d16Sj += pow(16.0, d-k) / (double)(8*k + j);
+   */
+
+  return d16Sj - floor (d16Sj);
+}
+
+/*
+ * {16^d Pi} = {4*{16^d S1} - 2*{16^d S4} - {16^d S5} - {16^d S6}}
+ * [BBP ALGORITMUS] David H. Bailey: The
+ * BBP Algorithm for Pi. alapján.
+ */
+main ()
+{
+
+  double d16Pi = 0.0;
+
+  double d16S1t = 0.0;
+  double d16S4t = 0.0;
+  double d16S5t = 0.0;
+  double d16S6t = 0.0;
+
+  int jegy;
+  int d;
+
+  clock_t delta = clock ();
+
+  for (d = 1000000; d &lt; 1000001; ++d)
+    {
+
+      d16Pi = 0.0;
+
+      d16S1t = d16Sj (d, 1);
+      d16S4t = d16Sj (d, 4);
+      d16S5t = d16Sj (d, 5);
+      d16S6t = d16Sj (d, 6);
+
+      d16Pi = 4.0 * d16S1t - 2.0 * d16S4t - d16S5t - d16S6t;
+
+      d16Pi = d16Pi - floor (d16Pi);
+
+      jegy = (int) floor (16.0 * d16Pi);
+
+    }
+
+  std::cout&lt;&lt;jegy&lt;&lt;std::endl;
+  delta = clock () - delta;
+  std::cout&lt;&lt;((double) delta / CLOCKS_PER_SEC)&lt;&lt;std::endl;
+} </programlisting></para>
+        <para>Futásról készült kép:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/PiBPP_cpp.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Megoldás
+            Java-ban:<programlisting>public class PiBBPBench {
+   
+    public static double d16Sj(int d, int j) {
+        
+        double d16Sj = 0.0d;
+        
+        for(int k=0; k&lt;=d; ++k)
+            d16Sj += (double)n16modk(d-k, 8*k + j) / (double)(8*k + j);
+        
+        
+        return d16Sj - Math.floor(d16Sj);
+    }
+   
+    public static long n16modk(int n, int k) {
+        
+        int t = 1;
+        while(t &lt;= n)
+            t *= 2;
+        
+        long r = 1;
+        
+        while(true) {
+            
+            if(n >= t) {
+                r = (16*r) % k;
+                n = n - t;
+            }
+            
+            t = t/2;
+            
+            if(t &lt; 1)
+                break;
+            
+            r = (r*r) % k;
+            
+        }
+        
+        return r;
+    }
+    
+    public static void main(String args[]) {
+        
+        double d16Pi = 0.0d;
+        
+        double d16S1t = 0.0d;
+        double d16S4t = 0.0d;
+        double d16S5t = 0.0d;
+        double d16S6t = 0.0d;
+        
+        int jegy = 0;
+        
+        long delta = System.currentTimeMillis();
+        
+        for(int d=1000000; d&lt;1000001; ++d) {
+            
+            d16Pi = 0.0d;
+            
+            d16S1t = d16Sj(d, 1);
+            d16S4t = d16Sj(d, 4);
+            d16S5t = d16Sj(d, 5);
+            d16S6t = d16Sj(d, 6);
+            
+            d16Pi = 4.0d*d16S1t - 2.0d*d16S4t - d16S5t - d16S6t;
+            
+            d16Pi = d16Pi - Math.floor(d16Pi);
+            
+            jegy = (int)Math.floor(16.0d*d16Pi);
+            
+        }
+        
+        System.out.println(jegy);
+        delta = System.currentTimeMillis() - delta;
+        System.out.println(delta/1000.0);
+    }
+}</programlisting></para>
+        <para>A futásról készült kép:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/PiBPP_java.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Megoldás
+            C#-ban:<programlisting>/*
+ * FileName: PiBBPBench.cs
+ * Author: Bátfai Norbert, nbatfai@inf.unideb.hu
+ * DIGIT 2005, Javat tanítok
+ */
+/// &lt;summary>
+/// A PiBBPBench C# átírata.
+/// &lt;/summary>
+/// &lt;remark>
+/// A PiBBP.java-ból kivettük az "objektumorientáltságot", így kaptuk
+/// a PiBBPBench osztályt, amit pedig átírtuk C# nyelvre.
+///
+/// (A PiBBP osztály a BBP (Bailey-Borwein-Plouffe) algoritmust a Pi hexa
+/// jegyeinek számolását végző osztály. A könnyebb olvahatóság
+/// kedvéért a változó és metódus neveket megpróbáltuk az algoritmust
+/// bemutató [BBP ALGORITMUS] David H. Bailey: The BBP Algorithm for Pi.
+/// cikk jelöléseihez.)
+/// &lt;/remark>
+public class PiBBPBench {
+    /// &lt;remark>
+    /// BBP algoritmus a Pi-hez, a [BBP ALGORITMUS] David H. Bailey: The
+    /// BBP Algorithm for Pi. alapján a {16^d Sj} részlet kiszámítása.
+    /// &lt;/remark>
+    /// &lt;param>
+    /// d   a d+1. hexa jegytől számoljuk a hexa jegyeket
+    /// &lt;/param>
+    /// &lt;param>
+    /// j   Sj indexe
+    /// &lt;/param>
+    public static double d16Sj(int d, int j) {
+        
+        double d16Sj = 0.0d;
+        
+        for(int k=0; k&lt;=d; ++k)
+            d16Sj += (double)n16modk(d-k, 8*k + j) / (double)(8*k + j);
+        
+        /*
+        for(int k=d+1; k&lt;=2*d; ++k)
+            d16Sj += System.Math.pow(16.0d, d-k) / (double)(8*k + j);
+         */
+        
+        return d16Sj - System.Math.Floor(d16Sj);
+    }
+    /// &lt;summary>
+    /// Bináris hatványozás mod k, a 16^n mod k kiszámítása.
+    /// &lt;/summary>
+    /// &lt;param>
+    /// n   kitevő
+    /// &lt;/param>
+    /// &lt;param>
+    /// k   modulus
+    /// &lt;/param>
+    public static long n16modk(int n, int k) {
+        
+        int t = 1;
+        while(t &lt;= n)
+            t *= 2;
+        
+        long r = 1;
+        
+        while(true) {
+            
+            if(n >= t) {
+                r = (16*r) % k;
+                n = n - t;
+            }
+            
+            t = t/2;
+            
+            if(t &lt; 1)
+                break;
+            
+            r = (r*r) % k;
+            
+        }
+        
+        return r;
+    }
+    /// &lt;remark>
+    /// A [BBP ALGORITMUS] David H. Bailey: The
+    /// BBP Algorithm for Pi. alapján a
+    /// {16^d Pi} = {4*{16^d S1} - 2*{16^d S4} - {16^d S5} - {16^d S6}}
+    /// kiszámítása, a {} a törtrészt jelöli. A Pi hexa kifejtésében a
+    /// d+1. hexa jegytől
+    /// &lt;/remark>
+     public static void Main(System.String[]args) { 
+        
+        double d16Pi = 0.0d;
+        
+        double d16S1t = 0.0d;
+        double d16S4t = 0.0d;
+        double d16S5t = 0.0d;
+        double d16S6t = 0.0d;
+        
+        int jegy = 0;
+        
+        System.DateTime kezd = System.DateTime.Now;
+        
+        for(int d=1000000; d&lt;1000001; ++d) {
+            
+            d16Pi = 0.0d;
+            
+            d16S1t = d16Sj(d, 1);
+            d16S4t = d16Sj(d, 4);
+            d16S5t = d16Sj(d, 5);
+            d16S6t = d16Sj(d, 6);
+            
+            d16Pi = 4.0d*d16S1t - 2.0d*d16S4t - d16S5t - d16S6t;
+            
+            d16Pi = d16Pi - System.Math.Floor(d16Pi);
+            
+            jegy = (int)System.Math.Floor(16.0d*d16Pi);
+            
+        }
+        
+        System.Console.WriteLine(jegy);
+        System.TimeSpan delta = System.DateTime.Now.Subtract(kezd);
+        System.Console.WriteLine(delta.TotalMilliseconds/1000.0);
+    }
+} </programlisting></para>
+        <para>Futásról készült kép:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/PiBPP_cs.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>
+            <table frame="all">
+                <title>A táblázat:</title>
+                <tgroup cols="4">
+                    <colspec colname="c1" colnum="1" colwidth="1*"/>
+                    <colspec colname="c2" colnum="2" colwidth="1*"/>
+                    <colspec colname="c3" colnum="3" colwidth="1*"/>
+                    <colspec colname="c4" colnum="4" colwidth="1*"/>
+                    <thead>
+                        <row>
+                            <entry>Nyelv</entry>
+                            <entry>10^6</entry>
+                            <entry>10^7</entry>
+                            <entry>10^8</entry>
+                        </row>
+                    </thead>
+                    <tbody>
+                        <row>
+                            <entry>C</entry>
+                            <entry>1.914375</entry>
+                            <entry>23.011836</entry>
+                            <entry>262.417018</entry>
+                        </row>
+                        <row>
+                            <entry>C++</entry>
+                            <entry>1.95192</entry>
+                            <entry>22.648</entry>
+                            <entry>264.164</entry>
+                        </row>
+                        <row>
+                            <entry>C#</entry>
+                            <entry>1.77732 </entry>
+                            <entry>20.987595</entry>
+                            <entry>236.722284</entry>
+                        </row>
+                        <row>
+                            <entry>Java</entry>
+                            <entry>1.846</entry>
+                            <entry>21.491</entry>
+                            <entry>248.433</entry>
+                        </row>
+                    </tbody>
+                </tgroup>
+            </table>
+        </para>
+        <para>Láthatjuk, hogy a C# végzett az első helyen futási időt tekintve.</para>
+    </section>
+    <section>
+        <title>Ciklomatikus komplexitás</title>
+        <para>A ciklomatikus komplexitás Thomas J. McCabe nevéhez fűződik, ugyanis 1976-ban ő
+            publikálta ezt a metrikát, ami egy forráskód komplexitását, azaz bonyolultságát fejezi
+            ki számban kifejezve. A számítás a gráfelméleten alapszik. A számítás képlete a
+            következő:</para>
+        <para><emphasis role="italic"><emphasis role="bold">M</emphasis> = E − N +
+            2P</emphasis></para>
+        <para>ahol E a gráf éleinek a száma, N a gráfben lévő csúcsok száma és P az összefüggő
+            komponensek száma. A ciklomatikus számot a következőképp számoljuk ki: M=E-N+P.</para>
+        <para>Feladatunk az volt, hogy számoljuk ki valamelyik programunk ciklomatikus komplexitását.
+            A feladatban a korábban már használt "binfa.c" nevű program ciklomatikus komplexitását
+            vizsgáljuk meg. Több program is képes a komplexitás kiszámolására illetve kiírására.
+            Jelen esetben a gnu complexity-hez fordulunk segítségért. Ez egy C állományok
+            komplexitását kiszámoló program, melyet terminálból a következő parancs beírásával
+            tudunk
+            beszerezni:<programlisting>sudo apt-get install complexity</programlisting></para>
+        <para>A programok komplexitását pedig a következőképp tudjuk
+            megnézni:<programlisting>complexity --histogram --score --thresh=0 'allomany_neve.c'</programlisting></para>
+        <para>A "binfa.c" forráskód komplexitása:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/complexity.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Láthatjuk, hogy a programban 4 függvény szerepel. Ez a négy függvény a szabadit, az
+            uj_elem, a kiir és a main függvény. Mellettük láthatjuk a komplexitásuk értékét.</para>
+    </section>
+</chapter>

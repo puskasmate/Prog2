@@ -1,0 +1,557 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Mandelbrot!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>A Mandelbrot halmaz</title>
+        <para> Forrás: <link
+                xlink:href="https://gitlab.com/puskasmate/bhax/blob/master/thematic_tutorials/bhax_textbook/Mandelbrot/mandelbrot.cpp"
+            /></para>
+        <para> A mandelbrot halmaz azon komplex számokból áll, melyek azon rekurzív sorozata
+            amelynek minden elemét az előző elem négyzetének és az első elemnek az összege adja, nem
+            a végtelenbe tart, tehát felülről határos. Ha ezt a halmazt ábrázoljuk, egy
+            fraktálalakzatot
+            kapunk.<programlisting>#include &lt;iostream>
+#include "png++/png.hpp"
+#include &lt;sys/times.h>
+
+#define MERET 600
+#define ITER_HAT 32000</programlisting></para>
+        <para>Programunk a szükséges header-ök és két konstans definiálásával kezdődik.</para>
+        <programlisting>void
+mandel (int kepadat[MERET][MERET]) {
+
+    // Mérünk időt (PP 64)
+    clock_t delta = clock ();
+    // Mérünk időt (PP 66)
+    struct tms tmsbuf1, tmsbuf2;
+    times (&amp;tmsbuf1);</programlisting>
+        <para>Ezt egy void típusú függvény deklarálása követi, amely egy kétdimenziós tömböt fog
+            visszaadni, egy 600x600-as méretűt, majd megnézzük a program futtatásához hány óraütésre
+            van szükség.</para>
+        <programlisting>// számítás adatai
+    float a = -2.0, b = .7, c = -1.35, d = 1.35;
+    int szelesseg = MERET, magassag = MERET, iteraciosHatar = ITER_HAT;
+
+    // a számítás
+    float dx = (b - a) / szelesseg;
+    float dy = (d - c) / magassag;
+    float reC, imC, reZ, imZ, ujreZ, ujimZ;
+    // Hány iterációt csináltunk?
+    int iteracio = 0;</programlisting>
+        <para>Felvesszük a számításhoz szükséges adatokat, megadjuk a kép szélességét és magasságát,
+            valamint deklarálunk az iterációs határ meghatározására egy változót, ami ahhoz fog
+            kelleni, hogy meddig fusson a pár sorral lejjebb található while ciklus. Felveszünk a
+            komplex számok miatt valós típusú változókat, külön a valós és külön a képzetes
+            részeknek, majd az iterációk számához egy gyűjtőváltozót is deklarálunk 0
+            kezdőértékkel.</para>
+        <programlisting>// Végigzongorázzuk a szélesség x magasság rácsot:
+    for (int j = 0; j &lt; magassag; ++j)
+    {
+        //sor = j;
+        for (int k = 0; k &lt; szelesseg; ++k)
+        {
+            // c = (reC, imC) a rács csomópontjainak
+            // megfelelő komplex szám
+            reC = a + k * dx;
+            imC = d - j * dy;
+            // z_0 = 0 = (reZ, imZ)
+            reZ = 0;
+            imZ = 0;
+            iteracio = 0;
+            // z_{n+1} = z_n * z_n + c iterációk
+            // számítása, amíg |z_n| &lt; 2 vagy még
+            // nem értük el a 255 iterációt, ha
+            // viszont elértük, akkor úgy vesszük,
+            // hogy a kiinduláci c komplex számra
+            // az iteráció konvergens, azaz a c a
+            // Mandelbrot halmaz eleme</programlisting>
+        <para>Két egymásba ágyazott for ciklussal végigmegyünk a kép pixelein, és előállítjuk a
+            valós és imaginárius részeit a komplex számoknak. Az első elem tehát a 0 lesz. A második
+            elemet úgy kapjuk, hogy az első elem négyzetéhez hozzáadjuk a fentebb előállított c
+            számot.</para>
+        <programlisting>while (reZ * reZ + imZ * imZ &lt; 4 &amp;&amp; iteracio &lt; iteraciosHatar)
+            {
+                // z_{n+1} = z_n * z_n + c
+                ujreZ = reZ * reZ - imZ * imZ + reC;
+                ujimZ = 2 * reZ * imZ + imC;
+                reZ = ujreZ;
+                imZ = ujimZ;
+
+                ++iteracio;
+
+            }
+kepadat[j][k] = iteracio;
+        }
+    }</programlisting>
+        <para>While ciklusunk addig fog futni, míg a fentebbi módon előállított komplex szám
+            négyzete el nem éri a 4-et, és az iterációk száma meg nem haladja 32000-et. A ciklusban
+            előállítjuk a következő komplex számot, majd az eredeti értékét felülírjük az újonan
+            kapott komplex szám értékével, és az iterációk számát növeljük.</para>
+        <programlisting>times (&amp;tmsbuf2);
+    std::cout &lt;&lt; tmsbuf2.tms_utime - tmsbuf1.tms_utime
+              + tmsbuf2.tms_stime - tmsbuf1.tms_stime &lt;&lt; std::endl;
+
+    delta = clock () - delta;
+    std::cout &lt;&lt; (float) delta / CLOCKS_PER_SEC &lt;&lt; " sec" &lt;&lt; std::endl;
+
+}</programlisting>
+        <programlisting>int
+main (int argc, char *argv[])
+{
+
+    if (argc != 2)
+    {
+        std::cout &lt;&lt; "Hasznalat: ./mandelpng fajlnev";
+        return -1;
+    }</programlisting>
+        <para>Main függvényünkben megvizsgáljuk, hogy elegendő argumentum áll e rendelkezésünkre, ha
+            nem, kiíratjuk a felhasználó számára, hogy hogyan lehet lefuttatni a programot.</para>
+        <programlisting>int kepadat[MERET][MERET];
+
+    mandel(kepadat);
+
+    png::image &lt; png::rgb_pixel > kep (MERET, MERET);</programlisting>
+        <para>Ezután felveszünk egy két dimenziós tömböt, majd meghívjuk rá a "mandel" nevű
+            függvényünket, majd előállítjuk a képet.</para>
+        <programlisting>for (int j = 0; j &lt; MERET; ++j)
+    {
+        //sor = j;
+        for (int k = 0; k &lt; MERET; ++k)
+        {
+            kep.set_pixel (k, j,
+                           png::rgb_pixel (255 -
+                                           (255 * kepadat[j][k]) / ITER_HAT,
+                                           255 -
+                                           (255 * kepadat[j][k]) / ITER_HAT,
+                                           255 -
+                                           (255 * kepadat[j][k]) / ITER_HAT));
+        }
+    }</programlisting>
+        <para>A pixelek rgb kódját pedig a fentebb látható módon állítjuk
+            elő.<programlisting>kep.write (argv[1]);
+    std::cout &lt;&lt; argv[1] &lt;&lt; " mentve" &lt;&lt; std::endl;
+
+}</programlisting></para>
+        <para>Parancssori argumentum első elemének a kép nevét kaptuk, tehát a képet ilyen néven
+            kell előállítanunk, majd felvilágosítjuk a felhasználót, hogy az általa válaszott néven
+            elkészült a kép.</para>
+    </section>        
+        
+    <section>
+        <title>A Mandelbrot halmaz a <filename>std::complex</filename> osztállyal</title>
+        <para> Forrás: <link
+                xlink:href="https://gitlab.com/puskasmate/bhax/blob/master/thematic_tutorials/bhax_textbook/Mandelbrot/m_komplex.cpp"
+            /></para>
+        <programlisting>#include &lt;iostream>
+#include "png++/png.hpp"
+#include &lt;complex></programlisting>
+        <para>Meghívjuk a szükséges header-öket, amint látható, itt a complex nevű header is
+            meghívásra került, ami lehetővé teszi a komplex számok használatát a forráskódban, így
+            egyszerűbb dolgunk van.</para>
+        <programlisting>int
+main ( int argc, char *argv[] )
+{
+
+  int szelesseg = 1920;
+  int magassag = 1080;
+  int iteraciosHatar = 255;
+  double a = -1.9;
+  double b = 0.7;
+  double c = -1.3;
+  double d = 1.3;
+</programlisting>
+        <para>Ebben a programban függvények használata helyett a main-ben írunk meg mindent. Az
+            előző forráskódhoz hasonlóan itt is deklaráljuk a szelesség, magasság, iterációs határ
+            és az a,b,c,d változót.</para>
+        <programlisting>if ( argc == 9 )
+    {
+      szelesseg = atoi ( argv[2] );
+      magassag =  atoi ( argv[3] );
+      iteraciosHatar =  atoi ( argv[4] );
+      a = atof ( argv[5] );
+      b = atof ( argv[6] );
+      c = atof ( argv[7] );
+      d = atof ( argv[8] );
+    }</programlisting>
+        <para>Megvizsáljuk, hogy 9 parancsosri argumentumot kaptunk e, ha igen, a "szelesseg"
+            változóba az "atoi" függvény segítségével beletöltjük a parancssori argumentum második
+            elemét. Ugyanezt tesszük a "magassag" és az "iteraciosHatar" váltózóval is, ezek rendre
+            a 3. és 4. parancssori argumentumot kapják értékül. Ugyanez történik az a,b,c,d
+            változókkal is, de mivel ezek double típussal lettek deklarálva, ezek az "atof" függvény
+            használatával kapják meg rendre az 5.,6.,7.,8. argumentumot.</para>
+        <programlisting>else
+    {
+      std::cout &lt;&lt; "Hasznalat: ./3.1.2 fajlnev szelesseg magassag n a b c d" &lt;&lt; std::endl;
+      return -1;
+    }</programlisting>
+        <para>Ellenkező esetben tájékoztatjuk a felhasználót a program futtatásának módjáról.</para>
+        <programlisting>png::image &lt; png::rgb_pixel > kep ( szelesseg, magassag );
+
+  double dx = ( b - a ) / szelesseg;
+  double dy = ( d - c ) / magassag;
+  double reC, imC, reZ, imZ;
+  int iteracio = 0;
+
+  std::cout &lt;&lt; "Szamitas\n";
+</programlisting>
+        <para>Előállítjuk a képet, a számításhoz szükséges váltózókat deklaráljuk, majd
+            felvilágosítjuk a felhasználót a számítás állapotáról.</para>
+        <programlisting>// j megy a sorokon
+  for ( int j = 0; j &lt; magassag; ++j )
+    {
+      // k megy az oszlopokon
+
+      for ( int k = 0; k &lt; szelesseg; ++k )
+        {
+
+          // c = (reC, imC) a halo racspontjainak
+          // megfelelo komplex szam
+
+          reC = a + k * dx;
+          imC = d - j * dy;
+          std::complex&lt;double> c ( reC, imC );
+
+          std::complex&lt;double> z_n ( 0, 0 );
+          iteracio = 0;</programlisting>
+        <para>Végigmegyünk a pixeleken, és előállítjuk a komplex számot, ami mindig hozzá fog adódni
+            a sorozat aktuális eleméhez, majd a sorozat első elemét 0 kezdőértékkel deklaráljuk
+            komplex típusú váltózóként.</para>
+        <programlisting>while ( std::abs ( z_n ) &lt; 4 &amp;&amp; iteracio &lt; iteraciosHatar )
+            {
+              z_n = z_n * z_n + c;
+
+              ++iteracio;
+            }
+
+          kep.set_pixel ( k, j,
+                          png::rgb_pixel ( iteracio%255, (iteracio*iteracio)%255, 0 ) );
+        }</programlisting>
+        <para>While ciklusunk itt is addig fut, míg ez a komplex szám abszolut értéke el nem éri a
+            4-et, illetve az iterációk száma el nem éri az iterációs határt. A ciklusban vesszük
+            ennek a számnak a négyzetét, és hozzáadjuk a fentebb látható módon előállított "c"
+            komplex számot és növeljük az iterációk számát. A kép pixeleinek rgb kódját az
+            "iteracio" változó értéke alapján beállítjuk.</para>
+        <programlisting>int szazalek = ( double ) j / ( double ) magassag * 100.0;
+      std::cout &lt;&lt; "\r" &lt;&lt; szazalek &lt;&lt; "%" &lt;&lt; std::flush;
+    }
+
+  kep.write ( argv[1] );
+  std::cout &lt;&lt; "\r" &lt;&lt; argv[1] &lt;&lt; " mentve." &lt;&lt; std::endl;
+
+}</programlisting>
+        <para>A számítás állapotát %-ban kiírjuk a felhasználó számára. Ez az "std::flush" miatt
+            folyamatosan frissülni fog. Ezután a parancsosri argumentum első elemeként kapott néven
+            létrehozzuk ezt a képet, és tájékoztatjuk a felhasználót, hogy az általa kívánt kép
+            elkészült.</para>
+    </section>        
+                
+    <section>
+        <title>Biomorfok</title>
+        <para>
+        </para>
+        <para>
+            Megoldás videó: <link xlink:href="https://youtu.be/IJMbgRzY76E">https://youtu.be/IJMbgRzY76E</link>
+        </para>
+        <para>
+            Megoldás forrása: <link xlink:href="https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/Biomorf">https://gitlab.com/nbatfai/bhax/tree/master/attention_raising/Biomorf</link>
+        </para>
+        <para> A biomorf algoritmus 1986-ban jött létre a Pickover által. Pickover egy programot
+            szánt írni, amely a Julia halmaz elemeit rajzolja ki. Az algoritmusban viszont
+            elkövetett egy hibát, így a program biomorf-hoz hasonlító alakzatokat rajzolt ki. A
+            forráskód tehát nem sok mindenben különbözik a feljebb elemzett mandelbrot halmazt
+            kirajzoló program forráskódjától. A program ugyanúgy végigmegy a rácson, viszont a
+            komplex számot egy másfajta módon állította elő. Több ilyen függvény is létezik, ezek
+            (és az ezekhez szükséges összes paraméter) megtalálható itt:<link
+                xlink:href="https://www.emis.de/journals/TJNSA/includes/files/articles/Vol9_Iss5_2305--2315_Biomorphs_via_modified_iterations.pdf"
+            /><programlisting>int szelesseg = 1920;
+    int magassag = 1080;
+    int iteraciosHatar = 255;
+    double xmin = -1.9;
+    double xmax = 0.7;
+    double ymin = -1.3;
+    double ymax = 1.3;
+    double reC = .285, imC = 0;
+    double R = 10.0;</programlisting></para>
+        <para>Két újabb váltózóval bővült a deklaráció, egy valós számmal. Ezek a fent említett új
+            paraméterek, melyeket az oldalon minden függvényhez táblázatba foglalva
+            láthatunk.<programlisting>if ( argc == 12 )
+    {
+        szelesseg = atoi ( argv[2] );
+        magassag =  atoi ( argv[3] );
+        iteraciosHatar =  atoi ( argv[4] );
+        xmin = atof ( argv[5] );
+        xmax = atof ( argv[6] );
+        ymin = atof ( argv[7] );
+        ymax = atof ( argv[8] );
+        reC = atof ( argv[9] );
+        imC = atof ( argv[10] );
+        R = atof ( argv[11] );</programlisting></para>
+        <para>Parancssori argumentumaink száma tehát 3-mal bővült a korábbihoz képest. Ez a 3
+            argumentum fogja adni a reC, imC, R értékeit.</para>
+        <programlisting>double dx = ( xmax - xmin ) / szelesseg;
+    double dy = ( ymax - ymin ) / magassag;
+
+    std::complex&lt;double> cc ( reC, imC );</programlisting>
+        <para>Meghatározunk a reC és imC alapján egy komplex számot.</para>
+        <programlisting>for (int i=0; i &lt; iteraciosHatar; ++i)
+            {
+
+                z_n = std::pow(z_n, 3) + cc;
+                //z_n = std::pow(z_n, 2) + std::sin(z_n) + cc;
+                if(std::real ( z_n ) > R || std::imag ( z_n ) > R)
+                {
+                    iteracio = i;
+                    break;
+                }
+            }
+</programlisting>
+        <para>Eddigi while ciklusunk a fentebb látható for ciklussá vált. Ez a cilus addig megy, míg
+            el nem éri az iterációs határt. A "z_n" komplex számot a fentebb látható módon
+            határoztuk meg. A feltételes utasításban látható a Pickover által elkövetett számítási
+            hiba. Eddig ugyanis a komplex szám hosszára tettünk vizsgálatot, valamint hogy az
+            iteráció eléri e az iterációs határt. Ebben a biomorfos változatban Pickover a valós
+            számunk valós és imaginárius részére tett vizsgálatot.</para>
+        <programlisting>kep.set_pixel ( x, y,
+                            png::rgb_pixel ( (iteracio*20)%255, (iteracio*40)%255, (iteracio*60)%255 ));</programlisting>
+        <para>Programunk még a pixelek színezésében tér el a mandelbrot-os programtól.</para>                        
+    </section>                     
+
+    <section>
+        <title>Mandelbrot nagyító és utazó C++ nyelven</title>
+        <para>
+            Építs GUI-t a Mandelbrot algoritmusra, lehessen egérrel nagyítani egy területet, illetve egy pontot
+            egérrel kiválasztva vizualizálja onnan a komplex iteréció bejárta z<subscript>n</subscript> komplex számokat!
+        </para>
+        <para>Forrás: <link
+                xlink:href="https://gitlab.com/puskasmate/bhax/tree/master/thematic_tutorials/bhax_textbook/Mandelbrot/Nagyito"
+            /></para>
+        <para><emphasis role="bold">frakablak.cpp</emphasis></para>
+            
+        <para>
+            <programlisting>#include "frakablak.h"
+
+FrakAblak::FrakAblak(double a, double b, double c, double d,
+                     int szelesseg, int iteraciosHatar, QWidget *parent)
+                         : QMainWindow(parent)
+{
+    setWindowTitle("Mandelbrot halmaz");
+
+    int magassag = (int)(szelesseg * ((d-c)/(b-a)));
+
+    setFixedSize(QSize(szelesseg, magassag));
+    fraktal= new QImage(szelesseg, magassag, QImage::Format_RGB32);
+
+    mandelbrot = new FrakSzal(a, b, c, d, szelesseg, magassag, iteraciosHatar, this);
+    mandelbrot->start();
+
+}
+
+FrakAblak::~FrakAblak()
+{
+    delete fraktal;
+    delete mandelbrot;
+}
+
+void FrakAblak::paintEvent(QPaintEvent*) {
+    QPainter qpainter(this);
+    qpainter.drawImage(0, 0, *fraktal);
+    qpainter.end();
+}
+
+void FrakAblak::vissza(int magassag, int *sor, int meret, int hatar)
+{
+    for(int i=0; i&lt;meret; ++i) {
+        //        QRgb szin = qRgb(0, 255-sor[i], 0);
+        QRgb szin;
+        if(sor[i] == hatar)
+            szin = qRgb(0,0,0);
+        else
+            szin = qRgb(
+                    255-sor[i],
+                    255-sor[i]%64,
+                    255-sor[i]%16 );
+
+        fraktal->setPixel(i, magassag, szin);
+    }
+    update();
+}</programlisting>
+        </para>
+        <para><emphasis role="bold"
+            >frakszal.h</emphasis><programlisting>#ifndef FRAKSZAL_H
+#define FRAKSZAL_H
+
+#include &lt;QThread>
+#include &lt;QImage>
+#include "frakablak.h"
+
+class FrakAblak;
+
+class FrakSzal : public QThread
+{
+    Q_OBJECT
+
+public:
+    FrakSzal(double a, double b, double c, double d,
+             int szelesseg, int magassag, int iteraciosHatar, FrakAblak *frakAblak);
+    ~FrakSzal();
+    void run();
+
+protected:
+    // A komplex sík vizsgált tartománya [a,b]x[c,d].
+    double a, b, c, d;
+    // A komplex sík vizsgált tartományára feszített
+    // háló szélessége és magassága.
+    int szelesseg, magassag;
+    // Max. hány lépésig vizsgáljuk a z_{n+1} = z_n * z_n + c iterációt?
+    // (tk. most a nagyítási pontosság)
+    int iteraciosHatar;
+
+    FrakAblak* frakAblak;
+    int* egySor;
+
+};
+
+#endif // FRAKSZAL_H</programlisting></para>
+        <para><emphasis role="bold"
+            >frakszal.cpp</emphasis><programlisting>#include "frakszal.h"
+
+FrakSzal::FrakSzal(double a, double b, double c, double d,
+                   int szelesseg, int magassag, int iteraciosHatar, FrakAblak *frakAblak)
+{
+    this->a = a;
+    this->b = b;
+    this->c = c;
+    this->d = d;
+    this->szelesseg = szelesseg;
+    this->iteraciosHatar = iteraciosHatar;
+    this->frakAblak = frakAblak;
+    this->magassag = magassag;
+
+    egySor = new int[szelesseg];
+}
+
+FrakSzal::~FrakSzal()
+{
+    delete[] egySor;
+}
+
+// A szál kódját a Javát tanítokhoz írt Java kódomból vettem át
+// http://www.tankonyvtar.hu/informatika/javat-tanitok-2-2-080904-1
+// mivel itt az algoritmust is leírtam/lerajzoltam, így meghagytam
+// a kommenteket, hogy a hallgató könnyen hozzáolvashassa az "elméletet",
+// ha érdekli.
+void FrakSzal::run()
+{
+    // A [a,b]x[c,d] tartományon milyen sűrű a
+    // megadott szélesség, magasság háló:
+    double dx = (b-a)/szelesseg;
+    double dy = (d-c)/magassag;
+    double reC, imC, reZ, imZ, ujreZ, ujimZ;
+    // Hány iterációt csináltunk?
+    int iteracio = 0;
+    // Végigzongorázzuk a szélesség x magasság hálót:
+    for(int j=0; j&lt;magassag; ++j) {
+        //sor = j;
+        for(int k=0; k&lt;szelesseg; ++k) {
+            // c = (reC, imC) a háló rácspontjainak
+            // megfelelő komplex szám
+            reC = a+k*dx;
+            imC = d-j*dy;
+            // z_0 = 0 = (reZ, imZ)
+            reZ = 0;
+            imZ = 0;
+            iteracio = 0;
+            // z_{n+1} = z_n * z_n + c iterációk
+            // számítása, amíg |z_n| &lt; 2 vagy még
+            // nem értük el a 255 iterációt, ha
+            // viszont elértük, akkor úgy vesszük,
+            // hogy a kiinduláci c komplex számra
+            // az iteráció konvergens, azaz a c a
+            // Mandelbrot halmaz eleme
+            while(reZ*reZ + imZ*imZ &lt; 4 &amp;&amp; iteracio &lt; iteraciosHatar) {
+                // z_{n+1} = z_n * z_n + c
+                ujreZ = reZ*reZ - imZ*imZ + reC;
+                ujimZ = 2*reZ*imZ + imC;
+                reZ = ujreZ;
+                imZ = ujimZ;
+
+                ++iteracio;
+
+            }
+            // ha a &lt; 4 feltétel nem teljesült és a
+            // iteráció &lt; iterációsHatár sérülésével lépett ki, azaz
+            // feltesszük a c-ről, hogy itt a z_{n+1} = z_n * z_n + c
+            // sorozat konvergens, azaz iteráció = iterációsHatár
+            // ekkor az iteráció %= 256 egyenlő 255, mert az esetleges
+            // nagyítasok során az iteráció = valahány * 256 + 255
+
+
+            //a színezést viszont már majd a FrakAblak osztályban lesz
+            egySor[k] = iteracio;
+        }
+        // Ábrázolásra átadjuk a kiszámolt sort a FrakAblak-nak.
+        frakAblak->vissza(j, egySor, szelesseg, iteraciosHatar);
+    }
+}</programlisting></para>
+        <para><emphasis role="bold"
+            >frakablak.h</emphasis><programlisting>#ifndef FRAKABLAK_H
+#define FRAKABLAK_H
+
+#include &lt;QMainWindow>
+#include &lt;QImage>
+#include &lt;QPainter>
+#include "frakszal.h"
+
+class FrakSzal;
+
+class FrakAblak : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    FrakAblak(double a = -2.0, double b = .7, double c = -1.35,
+              double d = 1.35, int szelesseg = 600,
+              int iteraciosHatar = 255, QWidget *parent = 0);
+    ~FrakAblak();
+    void vissza(int magassag , int * sor, int meret, int hatar) ;
+
+protected:
+    void paintEvent(QPaintEvent*);
+
+private:
+    QImage* fraktal;
+    FrakSzal* mandelbrot;
+
+};
+
+#endif // FRAKABLAK_H</programlisting></para>
+        <para><emphasis role="bold"
+            >main.cpp</emphasis><programlisting>#include &lt;QApplication>
+#include "frakablak.h"
+
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
+    // További adatokat olvashatsz le innen:
+    // http://www.tankonyvtar.hu/informatika/javat-tanitok-2-3-080904
+    FrakAblak w1,
+    w2(-.08292191725019529, -.082921917244591272,
+       -.9662079988595939, -.9662079988551173, 600, 3000),
+    w3(-.08292191724880625, -.0829219172470933,
+       -.9662079988581493, -.9662079988563615, 600, 4000),
+    w4(.14388310361318304, .14388310362702217,
+       .6523089200729396, .6523089200854384, 600, 38656);
+    w1.show();
+    w2.show();
+    w3.show();
+    w4.show();
+
+    return a.exec();
+}</programlisting></para>
+    </section>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+</chapter>                

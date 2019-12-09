@@ -1,0 +1,209 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Lauda!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>Port scan</title>
+        <para>A port scan egy olyan program, amely a hálózat nyitott portjait képes
+            megkeresni.</para>
+        <para>Port szkennert általában adminisztrátorok használnak, hálózatok biztonságának
+            ellenőrzése érdekében. A porgram azt csinálja, hogy megnézi, hogy egy hostot hány port
+            figyel.</para>
+        <para>A portszkenner forráskódja a
+            következő:<programlisting>public class KapuSzkenner {
+    
+    public static void main(String[] args) {
+        
+        for(int i=0; i&lt;1024; ++i)
+            
+            try {
+                
+                java.net.Socket socket = new java.net.Socket(args[0], i);
+                
+                System.out.println(i + " figyeli");
+                
+                socket.close();
+                
+            } catch (Exception e) {
+                
+                System.out.println(i + " nem figyeli");
+                
+            }
+    }
+    
+}</programlisting></para>
+        <para>A program annyit fog csinálni, hogy 1024-ig indít egy for ciklust, majd megpróbál a
+            parancssorban megadott ip című gép adott "i" portjával TCP kapcsolatot létesíteni. A
+            programban azért szükséges kivételkezelés, mivel ha nem tud kapcsolódni az adott
+            porthoz, vagyis nem figyeli, kivételt fog dobni, és leáll a program. Ez elkerülhető,
+            ugyanis a kivételkezelés miatt ilyenkor a catch blokk utasításai fognak végrehajtódni,
+            jelen esetben kiírja, hogy az adott portot egy folyamat sem figyeli.</para>
+        <para>Sikeres kapcsolódás esetén a catch blokk viszont nem fog végrehajtódni, így jelezni
+            fogja a program felénk, hogy az adott portot egy folyamat figyeli.</para>
+        <para>A program futásáról készült kép:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/portscan.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Ha a main függvényünk így néz ki, azaz kivesszük a
+            kivételkezelést:<programlisting>/*for(int i=0; i&lt;1024; ++i)
+            
+            try {*/
+                int i=0;
+                while(i&lt;1024){
+                java.net.Socket socket = new java.net.Socket(args[0], i);
+                
+                System.out.println(i + " figyeli");
+                
+                socket.close();
+                ++i;
+            }
+                
+           /* } catch (Exception e) {
+                
+                System.out.println(i + " nem figyeli");
+                
+            }*/</programlisting></para>
+        <para>Ez a következőt fogja jelenteni: a while ciklus 1024-ig fut, és az adott ip című gép i
+            portjával próbál TCP kapcsolatot létesíteni. Jelen esetben nincs kivételkezelés, tehát
+            ha nem sikerül TCP kapcsolatot létesíteni az aktuális i porttal, akkor nincs
+            végrehajtandó catch ág, ami kivétel esetén hívódik meg, így a fordító hibát fog dobni,
+            ami alább látható:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/port2.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+    </section>
+    <section>
+        <title>AOP</title>
+        <para>Az aspektus orientált programozás összetett programok esetében hasznos. A programok
+            áttekinthetősége és újrafelhasználhatósága érdekében aspektusokat fűzhetünk
+            programunkhoz. Ez annyit jelent, hogy az alap forráskód módosítása nélkül leszünk
+            képesek valamiféle módosítást végezni a programon, hogy futáskor a várt eredményt
+            kapjuk.</para>
+        <para>Az aspektusokat aspektusnyelven írjuk, mely nagyban hasonlít a forráskód megírásakor
+            használt objektumprientált programozási nyelvre. A megírt aspektust "hozzáfűzzük" az
+            alapprogramhoz, ezáltal a forráskód átírása nélkül tudjuk a program viselkedését
+            változtatni.</para>
+        <para>Az aspektus tehát a módosított programrészt tartalmazza, így önmagában nem
+            felhasználható. Jelenleg az AspectJ a legnépszerűbb és legfejlettebb aspektus orientált
+            nyelv.</para>
+        <para>A feladatunk az volt, hogy a BinFa java átiratába szőjünk bele egy aspektust.</para>
+        <para>A feladat megoldásakor a Prog1-es bejárásokat használtam alapul, ugyanis a programhoz
+            fűzött aspektusom a preorder kiírást fogja megvalósítani.</para>
+        <para>A feladat megoldásához szükségünk lesz az aspectjrt.jar állományra, melyet innen
+            tudunk beszerezni: <link
+                xlink:href="https://mvnrepository.com/artifact/org.aspectj/aspectjrt"/></para>
+        <para>
+            <programlisting>privileged aspect LZWBinFaa {</programlisting>
+        </para>
+        <para>Előszöris implementáljuk az aspektust.</para>
+        <programlisting>void around(LZWBinFa.Csomopont elem,java.io.PrintWriter os , LZWBinFa f) :
+    target (f) &amp;&amp; call (void kiir (LZWBinFa.Csomopont, java.io.PrintWriter)) &amp;&amp; args (elem,os)</programlisting>
+        <para>Az around advice az advice-ban megadott függvény viselkedését fogja megváltoztatni az általunk implementált módon. Paraméterül az around advice minden olyan elemet megkap, ami használva lesz. Jelen esetben a kiir függvény paramétereit kapja meg, illetve egy LZWBinFa objektumot, ugyanis a kiir függvényt egy LZWBinFa objektumra hívjuk meg. Célba vesszük az f
+            objektmot a target kulcsszóval, ez lényegében annyit jelent, hogy erre fogjuk meghívni a függvényt, majd hívjuk a kiir függvényt a call kulcsszóval, melyet az eredeti paramétertípusaival
+            implementálunk, majd argumentumként adjuk a neki a Csomopont típusú elem objektumot és
+            az
+            outputstreamet. Szóra fordítva ez a forráskód annyit csinál, hogy ha f-re meghívjuk a kiír függvényt, módosítsa a függvény funkcióját a lentebb láthatóra.<programlisting>{
+if (elem != null) {
+      ++f.melyseg;
+      for (int i = 0; i &lt; f.melyseg; ++i) {
+    
+        os.print("---");
+      }
+      os.print(elem.getBetu());
+      os.print("(");
+      os.print(f.melyseg - 1);
+      os.println(")");
+      f.kiir(elem.egyesGyermek(), os);
+      f.kiir(elem.nullasGyermek(), os);
+      
+    
+      --f.melyseg;
+    }
+
+    }
+}</programlisting></para>
+        <para>Ezután annyi dolgunk van még, hogy az új kiir függvényt implementáljuk, jelen esetben
+            ez a postorder megvalósítást jelenti.</para>
+        <para>A programhoz a következőképp tudjuk hozzáfűzni az aspektust, majd pedig
+            futtatni:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/aop.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Láthatjuk, hogy a tényleg változott az output:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/aop_2.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+    </section>
+    <section>
+        <title>Junit teszt</title>
+        <para>Feladatunk az volt, hogy az első védési program java átiratában teszteljük le a szórás
+            és mélység kiszámítására használt függvény pontosságát.</para>
+        <para>A junittal képesek vagyunk egy forráskód bizonyos függvényei által visszadobott
+            értéket ellenőrizni, összehasonlítani. Lássuk is a megoldást.</para>
+        <para>Először kézzel ki kellett számolnunk a "01111001001001000111" stringre a szórást és a
+            mélységet, viszont ez megtalálható az alábbi poszton:</para>
+        <para><link
+                xlink:href="https://progpater.blog.hu/2011/03/05/labormeres_otthon_avagy_hogyan_dolgozok_fel_egy_pedat"
+            /></para>
+        <para>Másodszor pedig a junit.jar és hamcrest.jar állományokat kell beszereznünk, jelen
+            esetben mindkettőből a legfrissebb verziót használom.</para>
+        <para>A következő dolgunk az ellenőrző program megírása. A forráskód alább
+            látható:<programlisting>import org.junit.Test;
+import static org.junit.Assert.assertEquals;</programlisting></para>
+        <para>Előszöris importáljuk a junit Test metódusát, amely a nevéből adódóan a tesztelésért
+            felelős, majd szintén a junit-ból az assertEquals függvényt, amely a kapott értéket a
+            kívánt értékkel fogja
+            összehasonlítani.<programlisting>public class LZWBinFaTest {
+    LZWBinFa binFa = new LZWBinFa();
+    String ertek = "01111001001001000111";
+    double melyseg = 4.0;
+    double szoras = 0.957427;</programlisting></para>
+        <para>Következő dolgunk a használandó állományok implementálása. Jelen esetben egy LZWBinFa
+            objektumot veszünk fel, majd egy string-ben tároljuk a fentebb említett értéket, ugyanis
+            erre fogjuk a szórást és a mélységet számolni. A melyseg és szoras változó a fentebb
+            említett kézzel számolt mélység és szórás érték
+            lesz.<programlisting>@Test
+    public void tesBitFeldolg() {
+        for (char b : ertek.toCharArray()) {
+            binFa.egyBitFeldolg(b);
+        }</programlisting></para>
+        <para>Következzen a test metódus. Ez a metódus lesz felelős a tesztelésért. A for ciklusban
+            a stringet alakítjuk át char típussá és töltjük bele egy char tömbbe. Ezután az
+            alapprogramunk egyBitFeldolg függényét hívjuk segítségül, és az eddig üres binFa
+            objektumunkra meghívjuk ezt a függvényt, és paraméterül a b chart adjuk, ezáltal felépül
+            a
+            fa.<programlisting>assertEquals(szoras, binFa.getSzoras(), 0.0001);
+assertEquals(melyseg, binFa.getMelyseg(), 0.0);
+    }
+}</programlisting></para>
+        <para>A program utolsó részében az assertEquals metódust hívjuk meg, melynek paraméterül a
+            szoras változót, és a fára a getSzoras függvénnyel kiszámolt szórás értékét adjuk,
+            0.0001 eltérés megengedésével. A második assertEquals metódus lényegében ugyanez lesz a
+            mélységre számolva, viszont itt nem történhet eltérés.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/junit.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Láthatjuk, hogy a futtatáshoz először az alap forráskódot kell lefordítanunk. Majd a
+            -classpath kapcsoló használatával a használni kívánt osztály elérési útját adhatjuk meg,
+            mely a . miatt az adott mappa lesz, és inkludáljuk még a junit.jar állományt, majd a
+            fordítani kívánt fájl nevét adjuk meg. Ezután futtatjuk, majd az eddigi argumentumok
+            után a hamcrest.jar-t is odaírjuk, az org.junit.runner.JUnitcore fogja futtatni az
+            LZWBinFaTest osztályt a terminálból. Ahogy azt a képen is láthatjuk, a teszt azt
+            eredményezte, hogy a függvényeink pontosak.</para>
+    </section>
+    
+</chapter>
+

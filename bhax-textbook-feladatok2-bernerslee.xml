@@ -1,0 +1,194 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Berners-Lee!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+<section>
+                <title>Python: Forstner Bertalan, Ekler Péter, Kelényi Imre: Bevezetés a
+                        mobilprogramozásba</title>
+                <para> A Python programozási nyelv Guido van Rossum nevéhez fűződik, ugyanis ő
+                        alkotta meg ezt a magas szintű, dinamikus, objektumorientált és
+                        platformfüggetlen nyelvet, melyet leginkább prototípus készítésére illetve
+                        tesztelésére szoktak alkalmazni. A python egy egész hamar elsajátítható
+                        szkriptnyelv, mely sok beépített eljárást tartalmaz, így komolyabb problémák
+                        megoldására is alkalmas. Támogat magas szintű típusokat is, ezzel a
+                        fejlesztést könnyíti meg. Előnyei miatt a nyelvet mobil operációs platform
+                        alá is elkészítették, ezzel egyszerűbbé tették a szoftver és
+                        prototípusfejlesztést mobil készülékre. </para>
+                <para>A python forráskód esetében nincs szükség fordításra, ugyanis elegendő a
+                        forrást megadni, az pedig automatikusan futtatja is az alkalmazást. C/C++ és
+                        Java nyelven is egy azonos jellegű probléma kiküszöbölése nagyobb
+                        erőfeszítést jelent mint Python nyelven. </para>
+                <para>A magas szintű adattípusok miatt a Python képes sokkal nagyobb problémák
+                        leírására, mint amekkorát az awk vagy a Perl nyelv használatával le tudunk
+                        írni. A Python egy nagyon magas szintű programozási nyelv. </para>
+                <para> A Python nyelvhez egy kódkönyvtár is készült, amelyben rengeteg
+                        újrahasznosítható, előre megírt modult tartalmaz, ez felgyorsítja az
+                        alkalmazásfejlesztést. Ilyen modulok pl. fájlkezelésre, hálózatkezelésre és
+                        rendszerhívásokra használt modulok.</para>
+                <para>A Python egy köztes nyelv, nincs szükség fordításra és linkelésre.</para>
+                <para>A Python tömör, mégis könnyen olvasható programok készítését teszi lehetővé,
+                        ezek rövidebbek mint az ugyanilyen utasítássorozattal rendelkező C, C++ vagy
+                        akár Java programok. </para>
+                <para>A python nyelvben a változók definiálására nincs szükség, illetve sem
+                        zárójeleket, sem pedig pontos vesszőket nem használunk. Ezeket a
+                        forráskódokban új sorral illetve tabulátor használatával tudjuk
+                        helyettesíteni. A programblokkok itt behúzással jönnek létre, a végét pedig
+                        onnan láthatjuk, hogy az adott sor behúzása az előttelévőknél kisebb. Az
+                        utasítások a python-ban a sor végéig tartanak, ez engedi meg a pontosvesszők
+                        használatának mellőzését. Nyílvánvalóan előfordulhat, hogy egy utasítás
+                        meghaladja a sor hosszát, ilyenkor egy \ jel használatával érhetjük el, hogy
+                        a következő sort is utasításnak tekintse a python. Itt fontos még
+                        megjegyezni, hogy úgy, ahogyan a többi nyelven megírt forráskódban is, itt
+                        is helyezhetünk el a kódban megjegyzést, ezt a # jel használatával tudjuk
+                        megvalósítani.</para>
+                <para>A python-ban is előjönnek a pointerek, referenciák. Itt ugyanis a változók
+                        azok objektumra mutató referenciák lesznek. A referenicákat a „del”
+                        előtaggal tudjuk törölni, a memóriaáramlás megszorítása érdekében pedig azt
+                        az objektumot, amelyre nem mutat referencia, törölni fogja nekünk a garbage
+                        collector. Python-ban tehát nincs a változóknak típusa. Na de akkor honnan
+                        tudja a program, hogy mégis milyen típust akarunk használni. A válasz
+                        meglepően egyszerű, és lényegre törő: kitalálja.</para>
+                <para>A változókat két típusra bonthatjuk:</para>
+                <para>1. Primitívek</para>
+                <itemizedlist>
+                        <listitem>
+                                <para>bool</para>
+                        </listitem>
+                        <listitem>
+                                <para>int</para>
+                        </listitem>
+                        <listitem>
+                                <para>float</para>
+                        </listitem>
+                        <listitem>
+                                <para>none</para>
+                        </listitem>
+                </itemizedlist>
+                <para>2. Objektumok</para>
+                <itemizedlist>
+                        <listitem>
+                                <para>str (string)</para>
+                        </listitem>
+                        <listitem>
+                                <para>list (lista)</para>
+                        </listitem>
+                        <listitem>
+                                <para>dict (szótár, asszociatív tömb)</para>
+                        </listitem>
+                </itemizedlist>
+                <para>Globális és lokális változókról beszélhetünk, a pythonban a többi nyelvtől
+                        eltérően az alapértelmezett változótípus a lokális, ezért ha egy változót a
+                        program további részeiben is szeretnénk használni, a függvény elején
+                        szükséges definiálnunk a global névtér használatával. A python annyiban
+                        egyszerűsíti a dolgunkat változók terén, hogy képes átképezni a hibásan
+                        implementált változótípust. Például az int, float és long változótípusok
+                        között támogatja a konverziót. A print szó már ismerős lehet számunkra. A
+                        pythonban ennek a szónak a használata mellett van lehetőségünk pl változók
+                        kiíratására, amiket a többi nyelvhez hasonlóan vesszővel kell
+                        elválasztanunk, ha többet adunk meg.</para>
+                <para>Természetesen a ciklusok, feltételes utasítások a pythonban is
+                        rendelkezésünkre állnak. A forráskódban címkéket is helyezhetünk el, ezeket
+                        a label szó használatával tudjuk megvalósítani, és a goto utasítással
+                        akárhonnan a megadott labelhez ugrunk.</para>
+                <para>A többi nyelvhez hasonlóan a kivételkezelés is megjelenik, ez a try-catch
+                        blokkhoz hasonlóan try-except blokkban történik, működése rokonaihoz
+                        hasonló. A try blokkban történik a végrehajtás, amíg semmi hiba nem ugrik
+                        fel, amint hiba történik, az except blokk utasításai hajtódnak végre.</para>
+                <para>A függvények definiálása itt a def szóval történik. A függvényeknek ugyanúgy
+                        itt is paraméterei lesznek, melyek érték szerint adódnak át, viszont vannak
+                        kivételek is. Ilyen kivételre példa a mutable típus.A python nyelv is
+                        támogatja az osztályok használatát, ezáltal az osztályok példányosításával
+                        keletkezett objektumok használatát is. Itt is értelemszerűen megjelenik az
+                        öröklődés is. Az osztályoknak itt is implementálhatunk függvényeket, itt
+                        viszont az első paraméter „self” kell, hogy legyen. A konstruktorok itt az
+                        __init__ metódus használatával jelenhetnek meg.</para>
+        </section>        
+    
+<section>
+                <title>Java 2 Útikalauz Programozóknak 5.0</title>
+                <para> A Java egy teljesen objektumorientált programozási nyelv. Ez annyit tesz,
+                        hogy a Java programok objektumokból és osztályokból állnak. </para>
+                <para> Az osztály két összetevőből áll: mezőkből és metódusokból, utóbbit más
+                        nyelvekben függvényeknek hívnak. A mezőben adatokat tárolhatunk, a metódusok
+                        pedig ezeken az adatokon végeznek valamiféle általunk megadott műveletet. A
+                        Java fordítóprogram bájtkód formátumra fordítja le a forráskódot, amely
+                        biztonsági szempontból előnyös, viszont hátrányos a sebességre nézve. </para>
+                <para>A forrásszöveget olvasva könnyen észrevehető, hogy a Java nyelv a C és a C++
+                        nyelvből fejlődött ki. Sok szerkezetben hasonlít is az utóbbi két nyelvhez,
+                        viszont alapvető pontokban el is tér tőlük. </para>
+                <para>Változók </para>
+                <para>A változók a Java nyelvben „nem osztály”, azaz egyszerű típusok, ezeket
+                        egyszerű adatok ábrázolására használjuk. </para>
+                <para>• boolean: logikai true (igaz) illetve false (hamis) értékkel </para>
+                <para>• char: 16 bites Unicode karakter </para>
+                <para>• byte: 8 bites előjeles egész szám </para>
+                <para> • short: 16 bites előjeles egész szám </para>
+                <para> • int: 32 bites előjeles egész szám </para>
+                <para>• long: 64 bites előjeles egész szám </para>
+                <para>• float: 32 bites lebegőpontos racionális szám </para>
+                <para>• double: 64 bites lebegőpontos racionális szám </para>
+                <para> A változókhoz az „=” operátor használatával tudunk értéket rendelni. A
+                        fentebb felsorolt egyszerű típusok esetében valódi értékadás történik,
+                        összetett típusoknál viszont csak egy referencia átmásolást jelent. A
+                        változók értéke kezdeti értékadás előtt nincs definiálva, ezért ha még nem
+                        adtunk nekik értéket, nem szabad felhasználni, ugyanis a fordítóprogram
+                        ezesetben hibát fog jelezni.</para>
+                <para>Konstansok</para>
+                <para> A programban gyakran előfordul, hogy egy értéket több helyen is szeretnénk
+                        szerepeltetni, ezért egy kényelmes megoldás, ha ezt az értéket
+                        definiáltatjuk a programban csak 1 helyen, és később csak egy névvel
+                        hivatkozunk rá, viszont ezt az értéket már nem tudjuk megváltoztatni. Egy
+                        konstans megadása a final kulcsszóval történik.</para>
+                <para> Megjegyzések A megjegyzéseket a forráskód átláthatóbbá tétele miatt szoktuk
+                        alkalmazni. pl. ha forráskódunkat egy másik programozó kezébe adjuk,
+                        egyértelművé tehetjük számára például egy változó szerepét.</para>
+                <para> A Java nyelvben 3 módszer van megjegyzések írására.</para>
+                <para> • „//” használatóval egysoros megjegyzést készíthetünk</para>
+                <para> • „/*” használatával több soros, hosszabb megjegyzést készíthetünk, a
+                        megjegyzés végén „*/” használatával jelezzük, hogy a megjegyzés véget
+                        ért</para>
+                <para> • „/**” használatával a dokumentációs megjegyzés válik lehetővé, ezt ugyanúgy
+                        kell lezárnunk, mint a több soros megjegyzést </para>
+                <para>Tömbök itt is megjelennek. A tömbökben objektumhivatkozások lesznek eltárolva.
+                        Ebben a nyelvben ha többdimenziós tömböt szeretnénk létrehozni, alternatív
+                        megoldást kell választanunk, ugyanis ebben a nyelvben többdimenziós tömb
+                        implementálására alapból nincs lehetőségünk. Java-ban az a felfogás
+                        uralkodik, ha többdimenziós tömbökről van szó, hogy a tömbben létrehozhatunk
+                        tömböket, ezáltal lényegében többdimenziós tömböt kapunk.</para>
+                <para>A java egy objektumorientált programozási nyelv. Az objektumok az osztályok
+                        példányai. Osztályokat a Class kulcsszó használatával tudunk létrehozni. Az
+                        objektumokat a new előtaggal tudujk példányosítani. Ha van például egy Emlős
+                        osztályunk, a következőképpen tudunk példányosítani Emlős objektumot: Emlős
+                        kutya = new Emlős ();. A javaban a new operátor foglal helyet az objektumnak
+                        a memóriában. Az osztálynak a tulajdonságai a memóriában a C/C++-szal
+                        ellentétben nem memóriacímre mutató referenciát, tartalmaznak, hanem az
+                        osztály adott tulajdonságára mutató referenciát. Az osztályok referenciák
+                        is. A Javaban a memóriaszivárgás elkerülése érdekében, ha egy objektumot nem
+                        használunk, azt alapból törölni fogja.</para>
+                <para>A kivételkezelés a C nyelvek és a python nyelvhez hasonlóan itt is megjelenik.
+                        Ez try-catch blokkban fog létrejönni. A try blokkban kell elhelyeznünk a
+                        forráskódot, ami amennyiben nem tartalmaz hibát, végrehajtódik, viszont ha a
+                        fordító hibát talál, a catch blokkban történi utasítások fognak
+                        végrehajtódni.</para>
+                <para>A java-ban az operátorok megegyeznek a C és C++-ban használt
+                        operátorokkal.</para>
+                <para>A típuskonverzió itt is megjelenik. A konverzió viszont történhet
+                        automatikusan illetve explicit módon. Automatikus konverzió akkor
+                        következhet be, ha például primitív típusokkal végzünk valamilyen műveletet,
+                        és ekkor az eredmény típusa mindig a legnagyobb memóriaterülettel bíró típus
+                        lesz a kiértékelés. Explicit konverzió segítségével tudjuk megadni, hogy
+                        pontosan milyen típussal kívánunk dolgozni. Szövegek esetén
+                        szövegkonverzióról beszélünk, ez akkor jelenik meg, ha egy nem String típusú
+                        változót Stringgé akarunk alakítani. </para>
+                <para>C++-ban az osztálytagokat a „::” operátorral tudtuk elérni. Javaban az adott
+                        tagokat „.” használatával tudjuk elérni. Az utasításoknak itt is 2 fajtája
+                        lesz. Vannak a kifejezések, ilyen például az értékadás, és a
+                        deklarációs-utasítások. A feltételes utasításnak két fajtája van, van a jól
+                        ismert egyszerű típusa, az if, és van az összetett típusa, mely
+                        switch-case-ekben merül ki. A már jól ismert ciklusok természetesen Javaban
+                        is megtalálhatók, ez a for, a while és a do-while ciklus.</para>
+        </section>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+</chapter>                

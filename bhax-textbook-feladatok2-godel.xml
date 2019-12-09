@@ -1,0 +1,185 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Gödel!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+
+    <section>
+        <title>Gengszterek</title>
+        <para>A robotautó bajnokság célja egy egységes platform biztosítása kutatási
+            forgalomirányítás vizsgálatához.</para>
+        <para>A program lényege, hogy gengszterek, és őket kergető rendőrök taláhatóak Debrecen
+            térképén, folyamatos mozgásban, míg a rendőrök el nem kapják a gengsztereket.</para>
+        <para>A projekt felélesztése az alábbi linken található meg: <link
+                xlink:href="https://github.com/Flibielt/robocar-emulator?fbclid=IwAR1CH-VLCkLwktFpy0G-T0fQZcLh-AgalyysPbbsbydPLBn0q3am40U5lMo#hiba-jav%C3%ADt%C3%A1sok-%C3%A9s-haszn%C3%A1lat"
+            /></para>
+        <para>A szükséges csomagok telepítése után a program futtatás a következőképp (nézne)
+            ki.</para>
+        <para>Először Debrecen városát kell elindítanunk az RCEMU mappából.</para>
+        <programlisting>src/smartcity --node2gps=../lmap.txt</programlisting>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/robocar_debrecen.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Ezután egy új ablakot kell megnyitnunk, és ugyancsak az RCEMU mappában maradva a
+            közlekedést is elindítjuk az alábbi parancs bepötyögésével.
+            <programlisting>src/traffic</programlisting></para>
+        <para>
+            <inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/traffic.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>És itt kezdődik az utolsó szakasz, ekkor már az RCWIN mappában dolgozunk. Következő
+            lépésként egy .jar fált kéne felépítenünk az alábbi parancs
+            kiadásával:<programlisting>mvn clean compile package site assembly:assembly</programlisting></para>
+        <para>Már csak egy lépés van hátra a program futtatásához, méghozzá az, hogy futtassuk a
+            programot az alábbi
+            paranccsal:<programlisting>java -jar target/site/justine-rcwin-0.0.16-jar-with-dependencies.jar ../lmap.txt</programlisting></para>
+        <para>Ezzel kirajzolódik számunkra a térkép, viszont így még nem teljes a szimuláció, el
+            kell ugyanis a térképen helyeznünk a gengsztereket és az őket üldöző rendőröket. Ezt a
+            lentebb látható két parancs bepötyögésével tudjuk elérni, az rcemu könyvtárban
+            dolgozva:<programlisting>src/samplemyshmclient --team=Police</programlisting></para>
+        <para>Elhelyeztük a
+            rendőröket.<programlisting>(sleep 1; echo "&lt;init Norbi 100 g>"; sleep 1)|telnet localhost 10007</programlisting></para>
+        <para>Elhelyeztük a rendőröket, és gyakorlatilag készen is vagyunk.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/robocar.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>A futásról a fentebb látható képet készítettem, sajnos az összes terminál ablak nem
+            fért fel láthatóan, viszont fentebb az összes parancs le van írva.</para>
+        <para>A feladat viszont az volt, hogy mutassunk rá a gengszterek rendezésére a
+            programban.</para>
+        <para>A lambda rendezés az alábbi pár sorban történik.</para>
+        <programlisting>std::sort ( gangsters.begin(), gangsters.end(), [this, cop] ( Gangster x, Gangster y )
+{
+return dst ( cop, x.to ) &lt; dst ( cop, y.to );
+}
+);</programlisting>
+        <para>Itt annyi történik, hogy a sort függvényben a gengszterek vektorát rendezzük. Átadjuk
+            neki a vektor elejét és végét, illetve összehasonlítjuk a gengszterek rendőrökkel való
+            távolságát, és mivel rendezés függvényben vagyunk, az a genszter lesz az első eleme a
+            vektornak, amelyik a legközelebb áll egy rendőrhöz.</para>
+    </section>
+    <section>
+        <title>STL Map érték szerinti rendezése</title>
+        <para>A C++-ban a map típusok tárolóként vannak jelen. A map típus egy növekvően rendezett
+            sszociatív tömb. Ebben a tömbben std::pair &lt;> segítségével kulcs-adat párokat
+            tárolunk. A kulcs és adat is paraméter lesz. A kulcs értéket rendezéshez és
+            megkülönböztetéshez használjuk. A map érték (adat) egy ehhez társított tartalom. A kulcs
+            és adat típusa lehet eltérő típusú is. Nézzük is a programot.</para>
+        <programlisting>typedef std::pair&lt;std::string, int> pair;</programlisting>
+        <para>Létrehozunk egy mapot, amit pair néven implementálunk, és egy string illetve int
+            típusú változót fog
+            tárolni.<programlisting>std::map&lt;std::string, int> map= {
+        {"Travis Scott", 999}, {"Kendrick Lamar", 522}, {"Kanye West", 625}, {"Video Info 1", 9999}
+    };</programlisting></para>
+        <para>Ezután létrehozunk egy mapot, és feltöltjük 5 kulcs-adat párral, ami a fent megadott
+            formalitáshoz hasonlóan sring-int párok lesznek.</para>
+        <programlisting>std::vector&lt;pair> vec;
+    
+    std::copy(map.begin(), map.end(), std::back_inserter(vec));</programlisting>
+        <para>Ezután létrehozunk egy üres vektort, és a fentebb létrehozott map értékpárjait
+            belemásoljuk ebbe a vektorba.</para>
+        <para>A továbbiakban erre a vektorra lesz
+            szükségünk.<programlisting>std::sort(vec.begin(), vec.end(),
+              [](const pair&amp; l, const pair&amp; r){
+                  return l.second &lt; r.second;
+              });</programlisting></para>
+        <para>A sort függvénynek átadjuk paraméterül a vektorunkat, és a párokat rendezzük. A
+            rendezés mapérték szerint történik, vagyis a bal oldali pár második (map) értéke legyen
+            kisebb a jobb oldali pár
+            mapértékétől.<programlisting>for(auto const &amp;pair: vec){
+        std::cout &lt;&lt; '{' &lt;&lt; pair.first &lt;&lt; ", " &lt;&lt; pair.second &lt;&lt; '}' &lt;&lt; std::endl;
+    }</programlisting></para>
+        <para>Ezután egy for each ciklussal végigmegyünk a vektoron és kiíratjuk a párok kulcs és
+            adatértékét.</para>
+        <para>A program futásáról készült kép:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/rendezes.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+    </section>
+    <section>
+        <title>Alternatív tabella</title>
+        <para>Feladatunk az volt, hogy mutassunk rá a programban a java.langInterface
+            Comparable&lt;T> szerepére.</para>
+        <para>Az alternatív tabella egy, a szokásostól eltérő módon állítja sorrendbe a csapatokat.
+            Az eredeti pontozás ugyanis úgy működik, hogy egy csapat egy győzelemért 3, döntetlenél
+            1, vereségért pedig 0 pontot kap. Az alternatív tabellában ez másképp van, ugyanis itt
+            az is figyelembe van véve, hogy milyen erősségű egyik illetve másik csapat, így itt nem
+            lesz egyenértékű, ha pl egy erős csapat egy gyenge vagy egy erős csapatot győz
+            le.</para>
+        <para>A projekt működéséhez először a Wiki2Matrix.java programra van szükség. Ebben át kell
+            írnunk néhány dolgot, hogy a tabella az aktuális csapatokat tartalmazza. Ezután
+            futtatjuk, és egy txt-be beleírjuk a kimenetét. Ez előállítja nekünk a mátrixot, amire
+            szükségünk lesz.</para>
+        <para>Ez a következőképp történik:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/matrix_fut.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Ez a txt-be egy linkmátrixot fog nekünk generálni. Ami lentebb látható:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/matrix.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Ezután nincs más dolgunk, mint ezt a linkmátrixot az AlternativTabella.java L nevű
+            kétdimenziós tömbjébe bemásolni, és ebben a programban is aktualizálni a csapatok nevét,
+            pontját.</para>
+        <para>Ezután ha futtatjuk, láthatjuk az aktuáli tabellát:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/alt_tab.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Itt látható számunkra a
+            lényeg:<programlisting>java.util.List&lt;Csapat> rendezettCsapatok = java.util.Arrays.asList(csapatok);
+    java.util.Collections.sort(rendezettCsapatok);</programlisting></para>
+        <para>Ez egy rendezettCsapatok nevű listát készít a csapatokból. Ez úgy történik, hogy a
+            csapatok tömbre ráengedjük a java.util.Arrays.asList függvényt. Majd a Collenctions.sort
+            függvénnyel rendezzük ezeket. A csapatok rendezése a compareTo függvény alapján fog
+            történni, ami lentebb látható.</para>
+        <para>
+            <programlisting>class Csapat implements Comparable&lt;Csapat> {
+
+  protected String nev;
+  protected double ertek;
+
+  public Csapat(String nev, double ertek) {
+    this.nev = nev;
+    this.ertek = ertek;
+  }
+
+  public int compareTo(Csapat csapat) {
+    if (this.ertek &lt; csapat.ertek) {
+      return -1;
+    } else if (this.ertek > csapat.ertek) {
+      return 1;
+    } else {
+      return 0;
+    }
+  }
+}</programlisting>
+        </para>
+        <para>Ebben az osztályban történik az összehasonlítás. Felvesszük a szükséges értékeket,
+            majd a Comparable osztályban a compareTo függvény fog meghívódni. A Comparable
+            interfészt a java.lang csomag tartalmazza, és egy függvényt, a compareTo-t tartalmazza.
+            A compareTo függvény két paramétert kér, két Csapat objektumot, majd ezeket
+            megvizsgálja, ha a vizsgálandó csapat értéke kisebb mint a paraméterként kapott csapat
+            értéke, akkor -1-et ad vissza, ha nagyobb, 1-et ad vissza, ha pedig egyenlő akkor
+            nullát. A fentebb deklarált rendezettCsapatok esetében a csapatokra a compareTo függvény
+            fog meghívódni, tehát a lista rendezése ezzel a függvénnyel fog történni.</para>
+    </section>
+            
+        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+</chapter>                

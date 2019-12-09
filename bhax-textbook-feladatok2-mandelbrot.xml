@@ -1,0 +1,316 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Mandelbrot!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>Reverse engineering UML osztálydiagram</title>
+        <para>A Reverse engineering annyit tesz, hogy egy már meglévő forráskódból készítünk UML
+            osztálydiagramot. A forráskódban előforduló osztályokat egy téglalappal ábrázoljuk, amit
+            3 részre bontunk: az osztály neve, az osztály attribútumai és az osztály függvényei,
+            eljárásai.</para>
+        <para>Feladatunk az volt, hogy szerkesszük meg az UML osztálydiagramját az első védési
+            programunknak, a binfának (z3a7.cpp).</para>
+        <para>Az osztálydiagram megszerkesztéséhez az Umbrello nevű programot használjuk, amely
+            könnyen beszerezhető az alábbi parancs
+            beírásával:<programlisting>sudo apt install umbrello</programlisting></para>
+        <para>A program telepítése után a kódimportáló varázsló segítségével a forráskód alapján
+            létrehozzuk az osztálydiagramot, ami a következőképp fog kinézni:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/osztalydiagram.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Láthatjuk, hogy a két osztály amit kaptunk összeköttetésben áll egymással. 2
+            összeköttetési típust különböztetunk meg.</para>
+        <para>Aggregáció és kompozíció. Az aggregáció ún. "rész-egész" kapcsolat. Azt jelenti, hogy
+            az egyik objektumban megtalálható a másik objektum is. Láthatjuk, hogy az LZWBinFa
+            osztályban megtalálható az LZWBinFa::Csomopont is. Az aggregációnak két fajtája van. A
+            gyenge aggregáció (az egyenes vonal végén üres rombusz) és az erős aggregáció (telt
+            rombusz), vagy másnéven kompozíció. A különbség a két alfaj között egyszerű. A gyenge
+            aggregációban az az osztály, amelyik tartalmazza a másikat, létezhet a tartalmazott
+            osztály nélkül is. Az erős aggregációban viszont a tartalmazó osztály nem létezhet a
+            tartalmazott osztály nélkül (gyökér nélkül nincs fa).</para>
+    </section>
+    <section>
+        <title>Forward engineering UML osztálydiagram</title>
+        <para>A Forward engineering a Reverse engineering másik változata, ilyenkor ugyanis nem
+            forráskódból állítunk elő osztálydiagramot, hanem osztálydiagramból állítunk elő
+            forráskódot. Feladatunk az volt tehát, hogy készítsünk egy osztálydiagramot, majd pedig
+            generáljunk belőle egy forráskódot.</para>
+        <para>A feladat megoldására az előző feladatban használt Umbrello programot használtam. A
+            fentebb lévő program java átíratát használtam fel, abból generáltam egy
+            osztálydiagramot, és a diagram alapján a kódgenerálási varázsló segítségével generáltam
+            java forráskódot.</para>
+        <para>Az osztálydiagram, amely alapján a forráskód készült:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/osztalydiagram_java.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Az ebből kapott forráskód pedig a következő:</para>
+        <programlisting>import java.io.PrintWriter;
+import LZWBinFa.Csomopont;
+
+
+/**
+ * Class LZWBinFa
+ */
+public class LZWBinFa {
+
+  //
+  // Fields
+  //
+
+  protected Csomopont gyoker;
+  private Csomopont fa;
+  private int melyseg;
+  private int atlagosszeg;
+  private int atlagdb;
+  private double szorasosszeg;
+  
+  //
+  // Constructors
+  //
+  public LZWBinFa () { };
+  
+  //
+  // Methods
+  //
+
+
+  //
+  // Accessor methods
+  //
+
+  /**
+   * Set the value of gyoker
+   * @param newVar the new value of gyoker
+   */
+  protected void setGyoker (Csomopont newVar) {
+    gyoker = newVar;
+  }
+
+  /**
+   * Get the value of gyoker
+   * @return the value of gyoker
+   */
+  protected Csomopont getGyoker () {
+    return gyoker;
+  }
+
+  /**
+   * Set the value of fa
+   * @param newVar the new value of fa
+   */
+  private void setFa (Csomopont newVar) {
+    fa = newVar;
+  }
+
+  /**
+   * Get the value of fa
+   * @return the value of fa
+   */
+  private Csomopont getFa () {
+    return fa;
+  }
+
+  /**
+   * Set the value of melyseg
+   * @param newVar the new value of melyseg
+   */
+  private void setMelyseg (int newVar) {
+    melyseg = newVar;
+  }
+
+  /**
+   * Get the value of melyseg
+   * @return the value of melyseg
+   */
+  private int getMelyseg () {
+    return melyseg;
+  }
+
+  /**
+   * Set the value of atlagosszeg
+   * @param newVar the new value of atlagosszeg
+   */
+  private void setAtlagosszeg (int newVar) {
+    atlagosszeg = newVar;
+  }
+
+  /**
+   * Get the value of atlagosszeg
+   * @return the value of atlagosszeg
+   */
+  private int getAtlagosszeg () {
+    return atlagosszeg;
+  }
+
+  /**
+   * Set the value of atlagdb
+   * @param newVar the new value of atlagdb
+   */
+  private void setAtlagdb (int newVar) {
+    atlagdb = newVar;
+  }
+
+  /**
+   * Get the value of atlagdb
+   * @return the value of atlagdb
+   */
+  private int getAtlagdb () {
+    return atlagdb;
+  }
+
+  /**
+   * Set the value of szorasosszeg
+   * @param newVar the new value of szorasosszeg
+   */
+  private void setSzorasosszeg (double newVar) {
+    szorasosszeg = newVar;
+  }
+
+  /**
+   * Get the value of szorasosszeg
+   * @return the value of szorasosszeg
+   */
+  private double getSzorasosszeg () {
+    return szorasosszeg;
+  }
+
+  //
+  // Other methods
+  //
+
+  /**
+   */
+  public void LZWBinFa()
+  {
+  }
+
+
+  /**
+   * @param        b
+   */
+  public void egyBitFeldolg(char b)
+  {
+  }
+
+
+  /**
+   */
+  public void kiir()
+  {
+  }
+
+
+  /**
+   * @param        os
+   */
+  public void kiir(java.io.PrintWriter os)
+  {
+  }
+
+
+  /**
+   * @param        elem
+   * @param        os
+   */
+  public void kiir(LZWBinFa.Csomopont elem, java.io.PrintWriter os)
+  {
+  }
+
+
+  /**
+   * @return       int
+   */
+  public int getMelyseg()
+  {
+  }
+
+
+  /**
+   * @return       double
+   */
+  public double getAtlag()
+  {
+  }
+
+
+  /**
+   * @return       double
+   */
+  public double getSzoras()
+  {
+  }
+
+
+  /**
+   * @param        elem
+   */
+  public void rmelyseg(LZWBinFa.Csomopont elem)
+  {
+  }
+
+
+  /**
+   * @param        elem
+   */
+  public void ratlag(LZWBinFa.Csomopont elem)
+  {
+  }
+
+
+  /**
+   * @param        elem
+   */
+  public void rszoras(LZWBinFa.Csomopont elem)
+  {
+  }
+
+
+  /**
+   */
+  public static void usage()
+  {
+  }
+
+
+  /**
+   * @param        args
+   */
+  public static void main(String args)
+  {
+  }
+
+
+}</programlisting>
+        <para>A feladat tökéletesen szemlélteti, hogy hosszabb programok (mint például a binfa)
+            esetében egy ilyen megoldás nagyon hasznos lehet, ugyanis jobban átláthatóbb a
+            forráskód, és az osztályok attribútumai és függvényei is definiálva vannak, már csak a
+            viselkedésüket kell megadnunk.</para>
+    </section>
+    <section>
+        <title>BPMN</title>
+        <para>A BPMN (Business Process Model and Notation) üzleti folyamatok grafikus
+            reprezentálására jött létre. A nyelvet üzleti folyamatok modellezésére használják,
+            könnyebbé teszi a folyamatok megfelelő sorrendbe szervezését és megértését. Feladatunk
+            az volt, hogy BPMN-ben egy folyamatot készítsünk. </para>
+        <para>A feladat megoldása több féle program segítségével is történhet. Ebben az esetben
+            először is fel kell telepítenünk az eclipse-t. Következő lépés a BPMN plugin
+            feltelepítése, ezután pedig új projekt létrehozásakor BPMN projektet kell
+            kiválasztanunk.</para>
+        <para>A feladat egy nagyon lebutított hétfői napomat írja le:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/bpmn.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Láthatjuk, hogy a BPMN segítségével teljesen egyértelműen meg tudjuk állapítani, mely
+            folyamat után melyik másik folyamat jön, illetve teljesen átlátható egy ilyen ábra egy
+            átlagember számára is.</para>
+    </section>
+</chapter>

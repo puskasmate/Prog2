@@ -1,0 +1,246 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Calvin!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+    </info>
+    <section>
+        <title>MNIST</title>
+        <para>A feladat az volt, hogy oldjuk meg az alap mnist-es feladatot, illetve oldjuk meg,
+            hogy saját, kézzel írott képet is felismerjen. A forrás itt található: <link
+                xlink:href="https://progpater.blog.hu/2016/11/13/hello_samu_a_tensorflow-bol"
+            /></para>
+        <para>Az <emphasis role="bold">mnist_softmax_UDPROG61.py</emphasis> forráskódra lesz
+            szükségünk. Futtatáskor errorok sora fog fogadni minket. Ennek rövides utánanézés során
+            hamar véget vethetünk.</para>
+        <para>Az első javítanivaló a program 70. sorában
+            található:<programlisting>cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(y ,y_))</programlisting></para>
+        <para>A tf.nn.softmax_cross_entropy_with_logits() függvénynek ha az api-ban utánanézünk,
+            láthatjuk, hogy az új verzió már más szintaktikát követ. Itt ugyanis nevesítenünk kell
+            az y és y_ értékeket, vagyis így kell
+            kinézniük:<programlisting>cross_entropy = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=y, labels=y_))</programlisting></para>
+        <para>A következő errort forrását már nehezebb volt megtalálni. Ez ugyanis a kód 46. sorában
+            található: <programlisting>img = tf.image.decode_png(file)</programlisting></para>
+        <para>A függvénynek utánanézve azt olvashatjuk, hogy egy channel paramétert is kér tőlünk.
+            Ez ugye több értékkel is bírhat. Alapértelmezetten 0, amely a png képek dekódolására
+            használatos, lehet 1, ami a grayscale képet ad vissza, lehet 2, ami rgb képet, és lehet
+            3, ami rgba képet ad vissza. Ahhoz, hogy megtudjuk, melyikre lesz szükségünk, az mnist
+            database-re vessünk egy pillantást. Láthatjuk, hogy a tanulásra használt képek fekete
+            hátérszínnel és fehér betűszínnel bírnak, illetve 28x28 pixelt tartalmaznak. Ez két
+            dolgot eredményez, egyrészt a grayscale kép csatornájára, vagyis az egyesre lesz
+            szükségünk, másrészt pedig az általunk felismertetni kívánt kép is ilyen értékekkel kell
+            bírjon. Kezdjük is a forráskód elemzését.</para>
+        <programlisting>def readimg():
+    file = tf.compat.v1.io.read_file("sajat8a.png")
+    img = tf.image.decode_png(file, channels=1)
+    return img</programlisting>
+        <para>A readimg függvényünk a kép beolvasásáért lesz felelős, melye először beolvassa a
+            grayscale képet, aztán dekódolja, végül visszaadja a
+            képet.<programlisting>x = tf.placeholder(tf.float32, [None, 784])
+  W = tf.Variable(tf.zeros([784, 10]))
+  b = tf.Variable(tf.zeros([10]))
+  y = tf.matmul(x, W) + b
+</programlisting></para>
+        <para>A main-ben x néven egy placeholdert hozunk létre, mely egy olyan tensornak foglal
+            helyet, mindig kap "enni". Amikor nem etetjük meg, errort fog dobni. A placeholder
+            függvény egy olyan értéket fog visszaadni, amelyet közvetlenül nem tudunk kiértékelni,
+            csak felhasználni feedinghez. Az x értéke tehát egy valós szám lesz, amely a képünket
+            kapja értékül. A placeholder paraméterei közt a [None, 784] egy shape-ként szerepel,
+            mely azt jelenti, hogy a placeholder első dimenziója a none miatt bármennyi lehet, itt
+            most 1 lesz, mivel egy képünk van, a második dimenziója pedig 784 elemből áll. A W
+            súlyérték lesz, a tf.Variable függvénynek paraméterül adjuk a pixelek számát (28x28),
+            majd a számjegyek számát (0-9). A b érték egy olyan tensor súlyát adja vissza, melynek
+            10 nullás eleme van. Az y összeszorozza az x és a W mátrixot, majd hozzáadja a b-t. Majd
+            kezdődik a tanítás és a tesztelés egy meglévő mnist
+            modellel.<programlisting>for i in range(1000):
+    batch_xs, batch_ys = mnist.train.next_batch(100)
+    sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
+    if i % 100 == 0:
+      print(i/10, "%")
+  print("----------------------------------------------------------")</programlisting></para>
+        <para>A tanítás fentebb látható. A tanítás, mint ahogy a for ciklusban is látható 1000
+            képpel történik, majd 100 képenként kiírjuk az adott feldolgozási állapotot úgy, hogy a
+            elosztjuk az i értékét tízzel, ezzel végülis 10%-onként történik a kiíratás.</para>
+        <para>Itt jön képbe a saját kép
+            felismerése.<programlisting>img = readimg()
+  image = img.eval()
+  image = image.reshape(28*28)</programlisting></para>
+        <para>Először beolvassuk a képet a readimg függvénnyel, majd az image-be kiírtékeljük az
+            eval függvény segítségével, majd a reshape függvénnyel újra leképezzük az image-et egy
+            egydimenziós
+            vektorra.<programlisting>matplotlib.pyplot.imshow(image.reshape(28, 28), cmap=matplotlib.pyplot.cm.binary)
+  matplotlib.pyplot.savefig("8.png")  
+  matplotlib.pyplot.show()
+
+  classification = sess.run(tf.argmax(y_conv, 1), feed_dict={x: [image], keep_prob: 1.0})
+
+  print("-- Ezt a halozat ennek ismeri fel: ", classification[0])
+  print("----------------------------------------------------------")</programlisting></para>
+        <para>Matlab függvények következnek, elmentjük és kirajzoljuk a
+            képet.<programlisting>feed_dict={x: [image]}</programlisting></para>
+        <para>A programban ez a kis kódcsipet fogja "etetni" az x-et a képünkkel.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/tflow.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>A program sikeresen fut, és az általam rajzolt 8-as invertált képe fentebb kirajzolva
+            lárható.</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/tflow_eight.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>A program sikeresen felismerte a kézzel rajzolt nyolcasomat, hurrá! :)</para>
+    </section>
+    <section>
+        <title>Deep Mnist</title>
+        <para>Feladatunk az előző feladathoz köthető. A program működése az előző programhoz nagyon
+            hasonló, ez tulajdonképpen az előző verziónak a mély változata. A feladatban Rácz András
+            volt segítségemre.</para>
+        <para>A forráskód ugyanazon repóban megtalálható, futtatáskor viszont errorok sorain kell
+            végigzongoráznunk, mivel deprecated a forráskód, ezért muszáj pár sort átírni. A
+            függvényeket ugyanis az új verzióban egy compat.v1 előttaggal kell illetnünk, aminek a
+            tf előtag és a függvény előtt között kell szerepelnie.</para>
+        <para>Amint az errorokat kijavítottuk, futtatás előtt még a forráskódon további módosítások
+            szükségesek, ugyanis a feladat ismételten az volt, hogy saját modellt is képes legyen
+            felismerni.<programlisting>def readimg():
+  file = tf.compat.v1.read_file("sajat8a.png")
+  img = tf.image.decode_png(file, 1)
+  return img</programlisting></para>
+        <para>Ehhez ugye az előző példával megegyezően definiálnunk kell egy readimg függvényt, ami
+            a saját képünket fogja beolvasni, neve pedig ugyanaz lesz, mint az előző
+            példában.</para>
+        <para>
+            <programlisting>mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
+
+  # Create the model
+  x = tf.compat.v1.placeholder(tf.float32, [None, 784])
+
+  # Define loss and optimizer
+  y_ = tf.compat.v1.placeholder(tf.float32, [None, 10])
+
+  # Build the graph for the deep net
+  y_conv, keep_prob = deepnn(x)
+
+  with tf.name_scope('loss'):
+    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=y_,
+                                                            logits=y_conv)
+  cross_entropy = tf.reduce_mean(cross_entropy)
+
+  with tf.name_scope('adam_optimizer'):
+    train_step = tf.compat.v1.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+
+  with tf.name_scope('accuracy'):
+    correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
+    correct_prediction = tf.cast(correct_prediction, tf.float32)
+  accuracy = tf.reduce_mean(correct_prediction)
+
+  graph_location = tempfile.mkdtemp()
+  print('Saving graph to: %s' % graph_location)
+  train_writer = tf.compat.v1.summary.FileWriter(graph_location)
+  train_writer.add_graph(tf.compat.v1.get_default_graph())</programlisting>
+        </para>
+        <para>A grayscale kép formázásáért a fentebb látható kódcsipet a
+            felelős.<programlisting>with tf.compat.v1.Session() as sess:
+    sess.run(tf.compat.v1.global_variables_initializer())
+    for i in range(20000):
+      batch = mnist.train.next_batch(50)
+      if i % 100 == 0:
+        train_accuracy = accuracy.eval(feed_dict={
+            x: batch[0], y_: batch[1], keep_prob: 1.0})
+        print('step %d, training accuracy %g' % (i, train_accuracy))
+      train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
+
+    print('test accuracy %g' % accuracy.eval(feed_dict={
+        x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+    </programlisting></para>
+        <para>A fentebb látható rész a tanítás. Ez közvetlenül a saját kép beolvasása előtt
+            helyezkedik el. 20000 képpel fog történni a tanítás. A feltételes utasításban az áll,
+            hogy minden 100. kép beolvasása után kiíratjuk, hogy hol tartunk, és hogy mekkora
+            pontossággal ismer fel a program képeket. Értelemszerűen minnél több képet tanult már
+            meg a program annál nagyobb pontossággal ismer fel képeket. A tanítás része jóval
+            részletesebben történik, mint az előző példa esetében, így ez a példa több futtatási
+            időt eredményez, ez esetemben 50 perc körül volt. A tanítás után következik a saját
+            képünk
+            beolvasása:<programlisting>img = readimg()
+    image = img.eval()
+    image = image.reshape(28*28)
+    matplotlib.pyplot.imshow(image.reshape(28, 28), cmap=matplotlib.pyplot.cm.binary)
+    matplotlib.pyplot.savefig("nyolc.png")
+    matplotlib.pyplot.show()
+
+    classification = sess.run(tf.argmax(y_conv, 1), feed_dict={x: [image], keep_prob:})
+
+    print("-- Ezt a halozat ennek ismeri fel: ", classification[0])</programlisting></para>
+        <para>A fentebb látható kódcsipetet a main fölé kell beillesztenünk, ugyanis így érjük el
+            ismételten, hogy saját képet olvasson be. Ez a rész megegyezik az előzőben található
+            résszel, beolvassuk a képet, újraméretezzük, elmentjük és megjelenítjük.</para>
+        <para>Nézzük is meg, felismeri e a már előző példában használt nyolcast:</para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/deep.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para><inlinemediaobject>
+                <imageobject>
+                    <imagedata fileref="img/deep_nyolc.png"/>
+                </imageobject>
+            </inlinemediaobject></para>
+        <para>Láthatjuk, hogy a felismerés sikeres volt.</para>
+    </section>
+    <section>
+        <title>Android telefonra a TF objektum detektálója</title>
+        <para>Az volt a feladatunk, hogy a TenserFlow objektum detektálóját töltsük le, és próbáljuk
+            ki.</para>
+        <para>A program a telefon kameráján rögzített objektumokat próbálja megállapítani. A
+            programot a következő linken tudjuk beszerezni: <link
+                xlink:href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/android"
+            /></para>
+        <para>A tensorflow repó klónozása után megkezdhetjük az apk fájl építését. Ehhez a
+            legegyszerűbb módszer az Android Studio segítségével történik. Még mielőtt azonban
+            felépítenénk benne a projektet, a build.gradle állomány 45. sorában lévő stringet át
+            kell írnunk erre: <emphasis role="bold">def nativeBuildSystem = 'none'</emphasis></para>
+        <para>Ezzel még nem végeztünk, importáláskor errorba ütközhetünk a gradle verziószáma miatt,
+            ezért lépjünk a gradle mappába, azon belül a wrapper mappába, az itt található <emphasis
+                role="bold">gradle-wrapper.properties</emphasis> állomány 6. sorában található
+            linket írjuk át az alábbi linkre: <link
+                xlink:href="https://services.gradle.org/distributions/gradle-4.10.1-all.zip"
+            /></para>
+        <para>A buildhez ugyanis a minimális verziószám a 4.10.1 lesz.</para>
+        <para>A programmal készítettem pár screenshotot.</para>
+        <informalfigure>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/billentyu.png"/>
+                </imageobject>
+            </mediaobject>
+        </informalfigure>
+        <informalfigure>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/eger.png"/>
+                </imageobject>
+            </mediaobject>
+        </informalfigure>
+        <informalfigure>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/penztarca.png"/>
+                </imageobject>
+            </mediaobject>
+        </informalfigure>
+        <informalfigure>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="img/monitor.png"/>
+                </imageobject>
+            </mediaobject>
+        </informalfigure>
+        <para>Láthatjuk, hogy a program egész ügyesen képes felismerni a tárgyakat, viszont van még
+            elég sok hiányossága, sajnos még túl sok objektumot téveszt el.</para>
+    </section>
+    
+</chapter>
+
